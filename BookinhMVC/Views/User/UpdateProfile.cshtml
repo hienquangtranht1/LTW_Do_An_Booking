@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Cập nhật thông tin cá nhân - Four Rock";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var notification = TempData["notification"] as string;
+    // Model is BenhNhan (patient) with user info, passed from controller
+    var patient = Model as BookinhMVC.Models.BenhNhan;
+}
+
+<div class="container profile-container">
+    <h2 class="text-center mb-4">Cập nhật thông tin cá nhân</h2>
+    @if (!string.IsNullOrEmpty(notification))
+    {
+        <div class="alert alert-info">@notification</div>
+    }
+    <form asp-controller="User" asp-action="UpdateProfile" method="post" enctype="multipart/form-data" autocomplete="off">
+        <!-- Tên đăng nhập (không thay đổi) -->
+        <div class="form-group">
+            <label for="username">Tên đăng nhập</label>
+            <input type="text" id="username" class="form-control" value="@patient?.NguoiDung?.TenDangNhap" disabled />
+        </div>
+        <!-- Họ và tên -->
+        <div class="form-group">
+            <label for="fullname">Họ và tên</label>
+            <input type="text" name="fullname" id="fullname" class="form-control" required value="@patient?.HoTen" />
+        </div>
+        <!-- Ngày sinh -->
+        <div class="form-group">
+            <label for="dob">Ngày sinh</label>
+            <input type="date" name="dob" id="dob" class="form-control" required value="@(patient?.NgaySinh.ToString("yyyy-MM-dd"))" />
+        </div>
+        <!-- Giới tính -->
+        <div class="form-group">
+            <label for="gender">Giới tính</label>
+            <select name="gender" id="gender" class="form-control" required>
+                <option value="Nam" selected="@(patient?.GioiTinh == "Nam" ? "selected" : null)">Nam</option>
+                <option value="Nữ" selected="@(patient?.GioiTinh == "Nữ" ? "selected" : null)">Nữ</option>
+                <option value="Khác" selected="@(patient?.GioiTinh == "Khác" ? "selected" : null)">Khác</option>
+            </select>
+        </div>
+        <!-- Email (không cho sửa) -->
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" class="form-control" value="@patient?.Email" disabled />
+            <input type="hidden" name="email" value="@patient?.Email" />
+        </div>
+        <!-- Số điện thoại -->
+        <div class="form-group">
+            <label for="phone">Số điện thoại</label>
+            <input type="text" name="phone" id="phone" class="form-control" required value="@patient?.SoDienThoai" />
+        </div>
+        <!-- Địa chỉ -->
+        <div class="form-group">
+            <label for="address">Địa chỉ</label>
+            <input type="text" name="address" id="address" class="form-control" value="@patient?.DiaChi" />
+        </div>
+        <!-- Số bảo hiểm -->
+        <div class="form-group">
+            <label for="soBaoHiem">Số bảo hiểm</label>
+            <input type="text" name="soBaoHiem" id="soBaoHiem" class="form-control" value="@patient?.SoBaoHiem" />
+        </div>
+        <!-- Hình ảnh cá nhân -->
+        <div class="form-group">
+            <label for="HinhAnhBenhNhan">Hình ảnh cá nhân</label>
+            @if (!string.IsNullOrEmpty(patient?.HinhAnhBenhNhan))
+            {
+                <div style="margin-bottom: 10px;">
+                    <img src="~/uploads/@patient.HinhAnhBenhNhan" alt="Hình ảnh cá nhân" class="profile-image" />
+                </div>
+            }
+            <input type="file" name="HinhAnhBenhNhan" id="HinhAnhBenhNhan" class="form-control-file" accept="image/*" />
+        </div>
+        <!-- Nút submit -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Cập nhật thông tin</button>
+        </div>
+    </form>
+</div>
+

@@ -1,0 +1,63 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model IEnumerable<BookinhMVC.Models.BacSi>
+@{
+    ViewData["Title"] = "Danh sách bác sĩ";
+    var departments = ViewBag.Departments as List<BookinhMVC.Models.Khoa>;
+    string searchName = ViewBag.SearchName as string ?? "";
+    int selectedDepartment = ViewBag.SelectedDepartment != null ? (int)ViewBag.SelectedDepartment : 0;
+}
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">Tìm kiếm bác sĩ</h2>
+    <form method="get" asp-action="Doctors" asp-controller="Home" class="row g-3 mb-4 justify-content-center">
+        <div class="col-md-4">
+            <input type="text" name="name" value="@searchName" class="form-control" placeholder="Nhập tên bác sĩ..." />
+        </div>
+        <div class="col-md-4">
+            <select name="departmentId" class="form-select">
+                <option value="0">Tất cả khoa</option>
+                @if (departments != null)
+                {
+                    foreach (var d in departments)
+                    {
+                        <option value="@d.MaKhoa" @@(selectedDepartment == d.MaKhoa ? "selected" : "")>@d.TenKhoa</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Tìm kiếm</button>
+        </div>
+    </form>
+
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var doctor in Model)
+            {
+                <div class="col-6 col-md-4 col-lg-3 mb-4">
+                    <a href="@Url.Action("Book", "Appointment", new { selectedDoctorId = doctor.MaBacSi })" class="text-decoration-none">
+                        <div class="card h-100 shadow-sm text-center">
+                            <img src="@(string.IsNullOrEmpty(doctor.HinhAnhBacSi) ? Url.Content("~/images/doctors/default.jpg") : Url.Content("~/uploads/" + doctor.HinhAnhBacSi))"
+                                 class="card-img-top mx-auto mt-3 rounded-circle"
+                                 style="width:120px;height:120px;object-fit:cover;"
+                                 alt="@doctor.HoTen" />
+                            <div class="card-body">
+                                <h5 class="card-title mb-1">@doctor.HoTen</h5>
+                                <p class="card-text text-muted mb-0" style="font-size:0.95em;">@doctor.Khoa?.TenKhoa</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center text-muted">Không tìm thấy bác sĩ phù hợp.</div>
+        }
+    </div>
+</div>

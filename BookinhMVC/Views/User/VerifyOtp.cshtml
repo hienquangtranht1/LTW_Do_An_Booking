@@ -1,0 +1,25 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    ViewData["Title"] = "Xác nhận OTP đăng ký";
+}
+<h2>Xác nhận OTP đăng ký</h2>
+@if (!ViewData.ModelState.IsValid)
+{
+        <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+                    <div>@error.ErrorMessage</div>
+        }
+        </div>
+}
+<form asp-action="VerifyOtp" method="post">
+    <div class="form-group">
+        <label for="otp">Nhập mã OTP đã gửi đến email:</label>
+        <input type="text" name="otp" id="otp" class="form-control" required maxlength="6" />
+    </div>
+    <button type="submit" class="btn btn-primary">Xác nhận</button>
+</form>

@@ -1,0 +1,438 @@
+﻿@{
+    ViewData["Title"] = "Four Rock - Chăm sóc sức khỏe hàng đầu";
+    var doctors = ViewBag.Doctors as List<BookinhMVC.Models.BacSi>;
+    var patientName = Context.Session.GetString("PatientName");
+    var userRole = Context.Session.GetString("UserRole");
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* ... (keep your chatbot and other custom styles here) ... */
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-image: none;
+            background-color: black;
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-control-prev-icon::after,
+        .carousel-control-next-icon::after {
+            content: '';
+        }
+        .carousel-control-prev-icon::before {
+            content: '\2039';
+            color: #fff;
+            font-size: 2rem;
+            font-weight: bold;
+            line-height: 2.5rem;
+            margin-left: 0.3rem;
+        }
+        .carousel-control-next-icon::before {
+            content: '\203A';
+            color: #fff;
+            font-size: 2rem;
+            font-weight: bold;
+            line-height: 2.5rem;
+            margin-right: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Chatbot AI Icon & Popup (unchanged) -->
+    @* ... (keep your chatbot code here) ... *@
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section">
+        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="~/images/slide1.png" class="d-block w-100" alt="Slide 1" />
+                    <div class="carousel-caption d-none d-md-block">
+                        <h2>Chăm sóc sức khỏe<br />toàn diện</h2>
+                        <p>Tiên phong trong đổi mới dịch vụ y tế với công nghệ hiện đại</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="~/images/slide2.png" class="d-block w-100" alt="Slide 2" />
+                    <div class="carousel-caption d-none d-md-block">
+                        <h2>Công nghệ<br />hiện đại</h2>
+                        <p>Ứng dụng thiết bị y tế tiên tiến và trí tuệ nhân tạo</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="~/images/slide3.png" class="d-block w-100" alt="Slide 3" />
+                    <div class="carousel-caption d-none d-md-block">
+                        <h2>Đội ngũ bác sĩ<br />chuyên nghiệp</h2>
+                        <p>Luôn sẵn sàng chăm sóc sức khỏe của bạn 24/7</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </section>
+    <section id="doctors" class="my-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Đội ngũ bác sĩ</h2>
+            @if (doctors != null && doctors.Count > 0)
+            {
+                int doctorsPerSlide = 4;
+                int totalSlides = (int)Math.Ceiling((double)doctors.Count / doctorsPerSlide);
+                <div id="doctorCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        @for (int slide = 0; slide < totalSlides; slide++)
+                        {
+                            <div class="carousel-item @(slide == 0 ? "active" : "")">
+                                <div class="row justify-content-center">
+                                    @for (int i = slide * doctorsPerSlide; i < Math.Min((slide + 1) * doctorsPerSlide, doctors.Count); i++)
+                                    {
+                                        var doctor = doctors[i];
+                                        <div class="col-6 col-md-4 col-lg-3 mb-4">
+                                            <a href="@Url.Action("Book", "Appointment", new { selectedDoctorId = doctor.MaBacSi })" class="text-decoration-none">
+                                                <div class="card h-100 shadow-sm text-center">
+                                                    <img src="@(string.IsNullOrEmpty(doctor.HinhAnhBacSi) ? Url.Content("~/images/doctors/default.jpg") : Url.Content("~/uploads/" + doctor.HinhAnhBacSi))"
+                                                         class="card-img-top mx-auto mt-3 rounded-circle"
+                                                         style="width:120px;height:120px;object-fit:cover;"
+                                                         alt="@doctor.HoTen" />
+                                                    <div class="card-body">
+                                                        <h5 class="card-title mb-1">@doctor.HoTen</h5>
+                                                        <p class="card-text text-muted mb-0" style="font-size:0.95em;">@doctor.Khoa?.TenKhoa</p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (totalSlides > 1)
+                    {
+                        <button class="carousel-control-prev" type="button" data-bs-target="#doctorCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#doctorCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="col-12 text-center text-muted">Chưa có bác sĩ nào.</div>
+            }
+            <div class="text-center mb-4">
+                <a href="@Url.Action("Doctors", "Home")" class="btn btn-dark btn-lg">
+                    <i class="fas fa-users"></i> Xem tất cả bác sĩ
+                </a>
+            </div>
+        </div>
+    </section>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const doctorCards = document.querySelectorAll(".doctor-card");
+            const loadMoreButton = document.getElementById("load-more");
+            let visibleCount = 0;
+            const doctorsPerPage = 4;
+
+            function showDoctors() {
+                for (let i = visibleCount; i < visibleCount + doctorsPerPage && i < doctorCards.length; i++) {
+                    doctorCards[i].style.display = "block";
+                }
+                visibleCount += doctorsPerPage;
+
+                if (visibleCount >= doctorCards.length) {
+                    loadMoreButton.style.display = "none";
+                }
+            }
+
+            loadMoreButton.addEventListener("click", showDoctors);
+
+            // Hiển thị 4 bác sĩ đầu tiên khi tải trang
+            showDoctors();
+        });
+    </script>
+
+    <!-- Services Section -->
+    <section id="services" class="py-5 bg-light">
+        <div class="container text-center">
+            <h2>Dịch vụ nổi bật</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 service-box">
+                        <img src="~/images/service1.png" class="card-img-top" alt="Khám tổng quát" style="height:120px;object-fit:contain;margin-top:20px;" />
+                        <div class="card-body">
+                            <h4 class="card-title">Khám tổng quát</h4>
+                            <p class="card-text">Khám sức khỏe ban đầu, phát hiện sớm các bệnh lý tiềm ẩn với đội ngũ bác sĩ chuyên nghiệp.</p>
+                            <a asp-action="GeneralCheckup" asp-controller="Home" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-right mr-2"></i>Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 service-box">
+                        <img src="~/images/service2.png" class="card-img-top" alt="Tim mạch" style="height:120px;object-fit:contain;margin-top:20px;" />
+                        <div class="card-body">
+                            <h4 class="card-title">Tim mạch</h4>
+                            <p class="card-text">Giám sát và điều trị bệnh về tim mạch với chuyên gia hàng đầu cùng thiết bị hiện đại.</p>
+                            <a asp-action="Cardiology" asp-controller="Home" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-right mr-2"></i>Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 service-box">
+                        <img src="~/images/service3.png" class="card-img-top" alt="Xét nghiệm" style="height:120px;object-fit:contain;margin-top:20px;" />
+                        <div class="card-body">
+                            <h4 class="card-title">Xét nghiệm</h4>
+                            <p class="card-text">Cung cấp các dịch vụ xét nghiệm hiện đại với độ chính xác cao và kết quả nhanh chóng.</p>
+                            <a asp-action="Testing" asp-controller="Home" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-right mr-2"></i>Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Doctors Section (unchanged) -->
+    @* ... (keep your doctors section as is) ... *@
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center">Giới thiệu về Four Rock</h2>
+            <div class="row mt-4 align-items-center">
+                <div class="col-md-5 mb-3">
+                    <img src="~/images/hospital.jpg" alt="Four Rock Hospital" class="img-fluid rounded shadow" style="max-height:260px;object-fit:cover;">
+                </div>
+                <div class="col-md-7 mb-3">
+                    <p>Four Rock tự hào là địa chỉ chăm sóc sức khỏe hàng đầu với cơ sở vật chất hiện đại, đội ngũ bác sĩ chuyên nghiệp và dịch vụ y tế toàn diện. Chúng tôi cam kết mang lại sự an tâm và hài lòng cho bệnh nhân thông qua chất lượng dịch vụ và ứng dụng công nghệ tiên tiến.</p>
+                    <div class="row mt-4">
+                        <div class="col-6 col-md-3 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-award fa-3x text-primary mb-2"></i>
+                                <h4>15+</h4>
+                                <p>Năm kinh nghiệm</p>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-user-doctor fa-3x text-primary mb-2"></i>
+                                <h4>50+</h4>
+                                <p>Bác sĩ chuyên khoa</p>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-users fa-3x text-primary mb-2"></i>
+                                <h4>10,000+</h4>
+                                <p>Bệnh nhân tin tưởng</p>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-star fa-3x text-primary mb-2"></i>
+                                <h4>4.9/5</h4>
+                                <p>Đánh giá từ khách hàng</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a asp-action="HospitalAbout" asp-controller="Home" class="btn btn-primary btn-lg mt-3">
+                        <i class="fas fa-info-circle mr-2"></i>Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section id="news" class="py-5">
+        <div class="container">
+            <h2 class="text-center">Tin tức & Sự kiện</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="~/images/new1.png" class="card-img-top" alt="Tin tức 1" />
+                        <div class="card-body">
+                            <span class="badge bg-primary mb-2">Tin tức</span>
+                            <h4 class="card-title">Hành trình 7 năm đồng hành cùng khách hàng</h4>
+                            <p class="card-text">Four Rock kỷ niệm 7 năm với các cột mốc ấn tượng trong việc chăm sóc sức khỏe cộng đồng.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar mr-1"></i>15/05/2024
+                                </small>
+                                <a asp-action="HospitalBlog" asp-controller="Home" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-read mr-1"></i>Đọc tiếp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="~/images/new2.png" class="card-img-top" alt="Tin tức 2" />
+                        <div class="card-body">
+                            <span class="badge bg-success mb-2">Sự kiện</span>
+                            <h4 class="card-title">Triển lãm công nghệ y tế 2025</h4>
+                            <p class="card-text">Cập nhật xu hướng công nghệ mới trong ngành y tế và các thiết bị hiện đại nhất.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar mr-1"></i>10/05/2024
+                                </small>
+                                <a asp-action="HospitalBlog" asp-controller="Home" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-read mr-1"></i>Đọc tiếp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="~/images/new3.png" class="card-img-top" alt="Tin tức 3" />
+                        <div class="card-body">
+                            <span class="badge bg-warning mb-2">Khuyến mãi</span>
+                            <h4 class="card-title">Chương trình khuyến mãi đặc biệt</h4>
+                            <p class="card-text">Những ưu đãi hấp dẫn dành cho khách hàng thân thiết trong tháng 5.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar mr-1"></i>05/05/2024
+                                </small>
+                                <a asp-action="HospitalBlog" asp-controller="Home" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-read mr-1"></i>Đọc tiếp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center">Liên hệ với chúng tôi</h2>
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="contact-info p-4 bg-white rounded shadow-sm">
+                        <a href="https://www.google.com/maps" target="_blank" class="text-decoration-none">
+                            <i class="fas fa-map-marker-alt fa-2x"></i>
+                            <h5 class="mt-2">Địa chỉ</h5>
+                            <p>Khu E Hutech, Quận 9<br />TP. Hồ Chí Minh</p>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="contact-info p-4 bg-white rounded shadow-sm">
+                        <i class="fas fa-phone fa-2x"></i>
+                        <h5 class="mt-2">Hotline</h5>
+                        <p>(0123) 456-789<br />Hỗ trợ 24/7</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="contact-info p-4 bg-white rounded shadow-sm">
+                        <i class="fas fa-envelope fa-2x"></i>
+                        <h5 class="mt-2">Email</h5>
+                        <p>info@fourrock.com<br />support@fourrock.com</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="map-responsive">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3959.2353806617543!2d106.78303187508985!3d10.855738189297968!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175276e7ea103df%3A0xb6cf10bb7d719327!2zSFVURUNIIC0gxJDhuqFpIGjhu41jIEPDtG5nIG5naOG7hyBUUC5IQ00gKFRodSBEdWMgQ2FtcHVzKQ!5e1!3m2!1svi!2s!4v1749117069821!5m2!1svi!2s"
+                                style="border:0; width:100%; height:350px;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-paper-plane mr-2"></i>Gửi tin nhắn</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Họ và tên" required />
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" class="form-control" placeholder="Email" required />
+                                </div>
+                                <div class="form-group">
+                                    <input type="tel" class="form-control" placeholder="Số điện thoại" required />
+                                </div>
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="4" placeholder="Nội dung tin nhắn" required></textarea>
+                                </div>
+                                <a asp-action="Contact" asp-controller="Home" class="btn btn-primary btn-block">
+                                    <i class="fas fa-send mr-2"></i>Trang liên hệ
+                                </a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-white text-center bg-dark py-4">
+        <div class="container">
+            <div class="row py-4">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-hospital-alt mr-2"></i>Four Rock</h5>
+                    <p>Chăm sóc sức khỏe hàng đầu với công nghệ hiện đại và đội ngũ y bác sĩ chuyên nghiệp.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Liên kết nhanh</h5>
+                    <ul class="list-unstyled">
+                        <li><a asp-action="GeneralCheckup" asp-controller="Home" class="text-white-50">Khám tổng quát</a></li>
+                        <li><a asp-action="Testing" asp-controller="Home" class="text-white-50">Xét nghiệm</a></li>
+                        <li><a asp-action="Cardiology" asp-controller="Home" class="text-white-50">Tim mạch</a></li>
+                        <li><a asp-action="HospitalAbout" asp-controller="Home" class="text-white-50">Giới thiệu</a></li>
+                        <li><a asp-action="HospitalBlog" asp-controller="Home" class="text-white-50">Blog</a></li>
+                        <li><a asp-action="Contact" asp-controller="Home" class="text-white-50">Liên hệ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Theo dõi chúng tôi</h5>
+                    <div class="social-links">
+                        <a href="#" class="text-white-50 mr-3"><i class="fab fa-facebook fa-2x"></i></a>
+                        <a href="#" class="text-white-50 mr-3"><i class="fab fa-youtube fa-2x"></i></a>
+                        <a href="#" class="text-white-50 mr-3"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="#" class="text-white-50"><i class="fab fa-twitter fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-white-50" />
+            <p>© 2024 Four Rock Hospital. All Rights Reserved. | Thiết kế bởi Four Rock Team</p>
+        </div>
+    </footer>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

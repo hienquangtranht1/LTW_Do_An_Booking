@@ -1,0 +1,110 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var error = ViewData["Error"] as string;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+        }
+
+        .register-container {
+            margin-top: 50px;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-container mx-auto col-md-6">
+            <h2 class="text-center mb-4">Đăng ký tài khoản</h2>
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var modelError in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>@modelError.ErrorMessage</div>
+                    }
+                </div>
+            }
+            <form asp-controller="User" asp-action="Register" method="post">
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập</label>
+                    <input type="text" class="form-control" id="username" name="username" required />
+                </div>
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <input type="password" class="form-control" id="password" name="password" required />
+                </div>
+                <div class="form-group">
+                    <label for="fullname">Họ và tên</label>
+                    <input type="text" class="form-control" id="fullname" name="fullname" required />
+                </div>
+                <div class="form-group">
+                    <label for="dob">Ngày sinh</label>
+                    <input type="date" class="form-control" id="dob" name="dob" required />
+                </div>
+                <div class="form-group">
+                    <label for="gender">Giới tính</label>
+                    <select class="form-control" id="gender" name="gender" required>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                        <option value="Khác">Khác</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Số điện thoại</label>
+                    <input type="text" class="form-control" id="phone" name="phone" required />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required />
+                </div>
+                <div class="form-group">
+                    <label for="address">Địa chỉ</label>
+                    <input type="text" class="form-control" id="address" name="address" />
+                </div>
+                <div class="form-group">
+                    <label for="soBaoHiem">Bảo Hiểm Y tế</label>
+                    <input type="text" class="form-control" id="soBaoHiem" name="soBaoHiem" required />
+                </div>
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">Gửi đăng ký</button>
+                    <a href="~/User/Login" class="btn btn-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
