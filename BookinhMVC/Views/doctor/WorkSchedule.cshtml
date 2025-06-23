@@ -1,0 +1,78 @@
+@model List<BookinhMVC.Models.LichLamViec>
+@{
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.Title = "Lịch làm việc tuần";
+    var weekStart = (DateTime)ViewBag.WeekStart;
+    var weekEnd = (DateTime)ViewBag.WeekEnd;
+}
+<div class="container mt-4">
+    <h2 class="mb-3" style="font-weight:bold;">Lịch Làm Việc Tuần (@weekStart.ToString("dd/MM/yyyy") - @weekEnd.ToString("dd/MM/yyyy"))</h2>
+    <form method="get" class="mb-3">
+        <button name="weekStart" value="@weekStart.AddDays(-7).ToString("yyyy-MM-dd")" class="btn btn-primary">« Tuần trước</button>
+        <button name="weekStart" value="@weekStart.AddDays(7).ToString("yyyy-MM-dd")" class="btn btn-primary">Tuần sau »</button>
+    </form>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Ngày</th>
+                <th>Lịch Làm Việc</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < 7; i++) {
+                var day = weekStart.AddDays(i);
+                var schedule = Model.FirstOrDefault(x => x.NgayLamViec.Date == day.Date);
+                <tr>
+                    <td>Thứ @(i + 2 > 8 ? 1 : i + 2) - @day.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (schedule != null) {
+                            <span style="background:yellow;padding:3px 10px;border-radius:5px;">@schedule.GioBatDau - @schedule.GioKetThuc</span>
+                        } else {
+                            <span>Không có lịch làm việc</span>
+                        }
+                    </td>
+                    <td>@(schedule?.TrangThai ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <h4 class="mt-4">Chỉnh Sửa / Thêm / Xóa Lịch Làm Việc</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Ngày</th>
+                <th>Giờ bắt đầu</th>
+                <th>Giờ kết thúc</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < 7; i++) {
+                var day = weekStart.AddDays(i);
+                var schedule = Model.FirstOrDefault(x => x.NgayLamViec.Date == day.Date);
+                <form method="post" asp-action="UpdateWorkSchedule" asp-controller="Doctor">
+                    <tr>
+                    <td>Thứ @(i + 2 > 8 ? 1 : i + 2) - @day.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <input type="time" name="GioBatDau" value="@(schedule != null ? schedule.GioBatDau.ToString(@"hh\:mm") : "")" class="form-control" required />
+                        </td>
+                        <td>
+                            <input type="time" name="GioKetThuc" value="@(schedule != null ? schedule.GioKetThuc.ToString(@"hh\:mm") : "")" class="form-control" required />
+                        </td>
+                        <td>
+                            <input type="hidden" name="Id" value="@(schedule != null ? schedule.MaLich : 0)" />
+                            <input type="hidden" name="Ngay" value="@day.ToString("yyyy-MM-dd")" />
+                            @if (schedule != null) {
+                                <button type="submit" name="actionType" value="update" class="btn btn-primary btn-sm">Cập nhật lịch</button>
+                                <button type="submit" name="actionType" value="delete" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa lịch này?');">Xóa lịch</button>
+                            } else {
+                                <button type="submit" name="actionType" value="add" class="btn btn-success btn-sm">Thêm mới lịch</button>
+                            }
+                        </td>
+                    </tr>
+                </form>
+            }
+        </tbody>
+    </table>
+</div> 

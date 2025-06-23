@@ -1,0 +1,78 @@
+@model List<BookinhMVC.Models.AppointmentViewModel>
+@{
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.Title = "Quản lý lịch hẹn";
+    var request = Context.Request; // Use the HttpContext to access the Request object
+}
+<div class="container mt-4">
+    <h2 class="mb-3" style="font-weight:bold;">Quản lý lịch hẹn</h2>
+    <form method="get" class="form-inline mb-3">
+        <label>Chọn ngày: </label>
+        <input type="date" name="date" class="form-control mx-2" value="@request.Query["date"]" />
+        <button type="submit" class="btn btn-primary">Tìm</button>
+    </form>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Giờ</th>
+                <th>Họ và tên</th>
+                <th>Địa chỉ</th>
+                <th>Giới tính</th>
+                <th>Triệu chứng</th>
+                <th>Trạng thái hiện tại</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for(int i=0;i<Model.Count;i++){
+                var item = Model[i];
+                <tr>
+                    <td>@(i+1)</td>
+                    <td>@item.NgayGio.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.HoTenBenhNhan</td>
+                    <td>@item.DiaChi</td>
+                    <td>@item.GioiTinh</td>
+                    <td>@item.TrieuChung</td>
+                    <td>@item.TrangThai</td>
+                    <td>
+                        <form method="post" asp-action="UpdateAppointment" asp-controller="Doctor">
+                            <input type="hidden" name="id" value="@item.MaLich" />
+                            <select name="status" class="form-control mb-1">
+                                <option value="Đã xác nhận" selected="@(item.TrangThai == "Đã xác nhận")">Đã xác nhận</option>
+                                <option value="Chờ xác nhận" selected="@(item.TrangThai == "Chờ xác nhận")">Chờ xác nhận</option>
+                                <option value="Đã hủy" selected="@(item.TrangThai == "Đã hủy")">Đã hủy</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm">Cập nhật</button>
+                        </form>
+                        <form method="post" asp-action="GetAvailableTimes" asp-controller="Doctor">
+                            <input type="hidden" name="id" value="@item.MaLich" />
+                            <select name="availableTime" class="form-control mb-1">
+                                @if (item.AvailableTimes?.Any() != true)
+                                {
+                                    <option value="">Không còn khung giờ trống</option>
+                                }
+                                else
+                                {
+                                    <option value="">Chọn giờ</option>
+                                    @foreach (var time in item.AvailableTimes)
+                                    {
+                                        if (TimeSpan.TryParse(time, out var timeSpan))
+                                        {
+                                            <option value="@time">@timeSpan.ToString(@"hh\:mm")</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@time">@(time.Length >= 5 ? time.Substring(0, 5) : time)</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-secondary btn-sm">Chọn giờ</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div> 

@@ -1,0 +1,95 @@
+﻿@using BookinhMVC.Models
+@model IEnumerable<Question>
+@{
+    ViewData["Title"] = "Hỏi đáp với bác sĩ";
+    var isLoggedIn = Context.Session.GetInt32("UserId") != null;
+    var doctors = ViewBag.Doctors as List<BacSi>; // Truyền từ controller
+}
+
+<div class="container my-5 pt-5">
+    <h2 class="text-center mb-4">Hỏi đáp với bác sĩ</h2>
+
+    @if (isLoggedIn)
+    {
+        <div class="question-form mb-5">
+            <h4>Đặt câu hỏi mới</h4>
+            <form asp-action="QA" asp-controller="Doctor" method="post">
+                <div class="form-group">
+                    <label for="doctor">Chọn bác sĩ</label>
+                    <select class="form-control" id="doctor" name="DoctorId" required>
+                        <option value="">Chọn bác sĩ</option>
+                        @if (doctors != null)
+                        {
+                            foreach (var doctor in doctors)
+                            {
+                                <option value="@doctor.MaBacSi">BS. @doctor.HoTen - @doctor.Khoa?.TenKhoa</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="title">Tiêu đề câu hỏi</label>
+                    <input type="text" class="form-control" id="title" name="Title" required />
+                </div>
+                <div class="form-group">
+                    <label for="content">Nội dung chi tiết</label>
+                    <textarea class="form-control" id="content" name="Content" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Gửi câu hỏi</button>
+            </form>
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success mt-3">@TempData["Message"]</div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center mb-5">
+            <i class="fas fa-info-circle"></i>
+            Vui lòng <a asp-action="Login" asp-controller="User">đăng nhập</a> để đặt câu hỏi cho bác sĩ.
+        </div>
+    }
+
+    <div class="mb-4">
+        <h4 class="text-center">Các câu hỏi đã được trả lời</h4>
+        <p class="text-center text-muted">Danh sách những vấn đề đã được bác sĩ tư vấn và giải đáp</p>
+    </div>
+
+    <div class="qa-list">
+        @if (Model.Any(q => !string.IsNullOrEmpty(q.Answer)))
+        {
+            @foreach (var q in Model.Where(q => !string.IsNullOrEmpty(q.Answer)))
+            {
+                <div class="card question-card mb-4">
+                    <div class="question-header p-3 bg-light border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">@q.Title</h5>
+                            <span class="status-badge badge badge-success">Đã trả lời</span>
+                        </div>
+                        <div class="meta-info mt-2 text-muted">
+                            <i class="fas fa-user-circle"></i> @(q.User?.TenDangNhap ?? "Ẩn danh")
+                            <i class="fas fa-user-md ml-3"></i> BS. @(q.Doctor?.HoTen ?? "")
+                            <i class="far fa-clock ml-3"></i> @q.CreatedAt.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                    <div class="question-content p-3">
+                        <p class="card-text mt-2">@q.Content</p>
+                        <div class="answer-section bg-light p-3 mt-3 rounded">
+                            <h6 class="text-primary"><i class="fas fa-comment-medical"></i> Trả lời từ bác sĩ:</h6>
+                            <p class="mb-0">@q.Answer</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">Chưa có câu hỏi nào được trả lời</div>
+        }
+    </div>
+</div>

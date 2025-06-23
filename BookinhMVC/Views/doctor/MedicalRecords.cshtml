@@ -1,0 +1,79 @@
+@model List<BookinhMVC.Models.MedicalRecordViewModel>
+@{
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.Title = "Danh sách bệnh án";
+    var request = Context.Request;
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+<div class="container mt-4">
+    <h2 class="mb-3" style="font-weight:bold;">Danh sách bệnh án</h2>
+    <form method="get" class="form-inline mb-3">
+        <input type="text" name="search" class="form-control mr-2" placeholder="Nhập từ khoá tìm kiếm..." value="@request.Query["search"]" />
+        <button type="submit" class="btn btn-primary mr-2">Tìm kiếm</button>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">Thêm hồ sơ bệnh án</button>
+    </form>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tên bệnh nhân</th>
+                <th>Tên bác sĩ</th>
+                <th>Ngày khám</th>
+                <th>Chẩn đoán</th>
+                <th>Phác đồ điều trị</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in Model){
+                <tr>
+                    <td>@item.TenBenhNhan</td>
+                    <td>@item.TenBacSi</td>
+                    <td>@item.NgayKham.ToString("yyyy-MM-dd")</td>
+                    <form method="post" asp-action="UpdateMedicalRecord" asp-controller="Doctor">
+                        <input type="hidden" name="MaHoSo" value="@item.MaHoSo" />
+                        <td><input type="text" name="ChanDoan" value="@item.ChanDoan" class="form-control" /></td>
+                        <td><input type="text" name="PhuongAnDieuTri" value="@item.PhuongAnDieuTri" class="form-control" /></td>
+                        <td><button type="submit" class="btn btn-primary btn-sm">Cập nhật</button></td>
+                    </form>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <!-- Modal thêm mới -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" asp-action="AddOrUpdateMedicalRecord" asp-controller="Doctor">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Nhập thông tin hồ sơ bệnh án mới</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="MaHoSo" value="0" />
+                        <div class="form-group">
+                            <input type="text" name="TenBenhNhan" class="form-control" placeholder="Tên bệnh nhân (nhập mã hoặc chọn ở nơi khác)" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="date" name="NgayKham" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="ChanDoan" class="form-control" placeholder="Chẩn đoán" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="PhuongAnDieuTri" class="form-control" placeholder="Phác đồ điều trị" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Thêm hồ sơ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script> 
