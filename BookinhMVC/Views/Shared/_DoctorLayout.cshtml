@@ -1,0 +1,146 @@
+@using Microsoft.AspNetCore.Http
+@using BookinhMVC.Models
+@{
+    var doctorName = Context.Session.GetString("DoctorName");
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Dashboard Bác sĩ</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            background: #f4f8fb;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 230px;
+            background: #2980b9;
+            color: #fff;
+            padding: 0;
+            z-index: 1000;
+        }
+
+            .sidebar .sidebar-header {
+                padding: 30px 20px 10px 20px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                border-bottom: 1px solid #ffffff22;
+            }
+
+            .sidebar .doctor-name {
+                font-size: 1.1rem;
+                margin: 10px 0 20px 0;
+                font-weight: 500;
+                color: #fff;
+            }
+
+            .sidebar ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+                .sidebar ul li {
+                    margin: 0;
+                }
+
+                    .sidebar ul li a {
+                        display: block;
+                        color: #fff;
+                        padding: 15px 25px;
+                        text-decoration: none;
+                        font-size: 1rem;
+                        border-left: 4px solid transparent;
+                        transition: background 0.2s, border-color 0.2s;
+                    }
+
+                        .sidebar ul li a.active, .sidebar ul li a:hover {
+                            background: #1565a0;
+                            border-left: 4px solid #fff;
+                            color: #fff;
+                        }
+
+            .sidebar .logout {
+                position: absolute;
+                bottom: 30px;
+                width: 100%;
+            }
+
+                .sidebar .logout a {
+                    color: #fff;
+                    padding: 15px 25px;
+                    display: block;
+                    text-align: left;
+                    font-weight: bold;
+                    border-left: 4px solid transparent;
+                }
+
+                    .sidebar .logout a:hover {
+                        background: #c0392b;
+                        border-left: 4px solid #fff;
+                    }
+
+        .main-content {
+            margin-left: 230px;
+            padding: 40px 30px 30px 30px;
+            min-height: 100vh;
+        }
+
+        @@media (max-width: 900px) {
+            .sidebar {
+                width: 100px;
+            }
+
+            .main-content {
+                margin-left: 100px;
+            }
+
+            .sidebar .sidebar-header, .sidebar .doctor-name, .sidebar ul li a span {
+                display: none;
+            }
+
+            .sidebar ul li a {
+                padding: 15px 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <i class="fa fa-user-md"></i> Bác sĩ
+        </div>
+        <div class="doctor-name">
+            <i class="fa fa-user"></i> @doctorName
+        </div>
+        <ul>
+            <li><a href="/Doctor/Appointments" class="@(Context.Request.Path.Value.Contains("Appointments") ? "active" : "")"><i class="fa fa-calendar-check"></i> <span>Lịch hẹn</span></a></li>
+            <li><a href="/Doctor/MedicalRecords" class="@(Context.Request.Path.Value.Contains("MedicalRecords") ? "active" : "")"><i class="fa fa-notes-medical"></i> <span>Hồ sơ bệnh án</span></a></li>
+            <li><a href="/Doctor/WorkSchedule" class="@(Context.Request.Path.Value.Contains("WorkSchedule") ? "active" : "")"><i class="fa fa-calendar-alt"></i> <span>Lịch làm việc</span></a></li>
+            <li><a href="/Doctor/Question" class="@(Context.Request.Path.Value.Contains("Question") ? "active" : "")"><i class="fa fa-question-circle"></i> <span>Câu hỏi</span></a></li>
+            <li><a href="/Doctor/Profile" class="@(Context.Request.Path.Value.Contains("Profile") ? "active" : "")"><i class="fa fa-user-cog"></i> <span>Thông tin cá nhân</span></a></li>
+            <li>
+                <a href="/Doctor/ChangePassword" class="@(Context.Request.Path.Value.Contains("ChangePassword") ? "active" : "")">
+                    <i class="fa fa-key"></i> <span>Đổi mật khẩu</span>
+                </a>
+            </li>
+        </ul>
+        <div class="logout">
+            <a href="/Doctor/Logout"><i class="fa fa-sign-out-alt"></i> <span>Đăng xuất</span></a>
+        </div>
+    </div>
+    <div class="main-content">
+        @RenderBody()
+    </div>
+    @RenderSection("Scripts", required: false)
+</body>
+</html> 
