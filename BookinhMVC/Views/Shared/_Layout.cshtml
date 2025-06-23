@@ -1,15 +1,25 @@
-﻿@{
-    var patientName = Context.Session.GetString("PatientName");
+﻿@using Microsoft.AspNetCore.Http
+@using BookinhMVC.Models
+@inject BookingContext _db
+@{
     var userRole = Context.Session.GetString("UserRole");
     var cskhName = Context.Session.GetString("CSKHName");
     var userId = Context.Session.GetInt32("UserId");
+    string patientName = null;
+    if (userRole == "Bệnh nhân" && userId != null)
+    {
+        var patient = _db.BenhNhans.FirstOrDefault(b => b.MaBenhNhan == userId);
+        patientName = patient?.HoTen;
+    }
+    // Xác định trạng thái đăng nhập của bất kỳ người dùng nào
+    bool isLoggedIn = !string.IsNullOrEmpty(userRole);
 }
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Four Rock</title>
+    <title>@ViewData["Title"] - Four Rock Hospital</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BookinhMVC.styles.css" asp-append-version="true" />
@@ -78,14 +88,14 @@
         <nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background: rgba(255,255,255,0.95);backdrop-filter: blur(10px);border-bottom: 1px solid #e0e0e0;transition: all 0.3s ease;padding: 1rem 0;">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index" style="font-weight:700;font-size:1.8rem;color:#2563eb;">
-                    <i class="fas fa-hospital-alt mr-2"></i>Four Rock
+                    <i class="fas fa-hospital-alt mr-2"></i>Four Rock Hospital
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav ms-auto align-items-center">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">
                                 <i class="fas fa-home mr-1"></i>Trang chủ
@@ -129,14 +139,14 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" asp-controller="Home" asp-action="Index#doctors">
-                                        <i class="fas fa-user-doctor mr-2"></i>Bác sĩ
+                                    <a href="@Url.Action("Doctors", "Home")">
+                                        <i class="fas fa-users"></i> Bác sĩ
                                     </a>
                                 </li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="QA" asp-action="Index">
+                            <a class="nav-link" asp-controller="Home" asp-action="QA">
                                 <i class="fas fa-question-circle mr-1"></i>Hỏi đáp
                             </a>
                         </li>
@@ -145,7 +155,6 @@
                                 <i class="fas fa-phone mr-1"></i>Liên hệ
                             </a>
                         </li>
-                        @* Hiển thị menu bệnh nhân nếu đã đăng nhập *@
                         @if (!string.IsNullOrEmpty(patientName) && userRole == "Bệnh nhân")
                         {
                             <li class="nav-item dropdown">
@@ -192,9 +201,19 @@
                                 <a class="btn btn-outline-primary mr-2" asp-controller="User" asp-action="Login">Đăng nhập</a>
                             </li>
                             <li class="nav-item">
-                                <a class="btn btn-warning" asp-controller="CSKH" asp-action="Login">
+                                <a class="btn btn-warning mr-2" asp-controller="CSKH" asp-action="Login">
                                     <i class="fas fa-headset mr-1"></i>Đăng nhập CSKH
                                 </a>
+                            </li>
+                        }
+                        @* Ẩn hai nút này khi bất kỳ người dùng nào đã đăng nhập *@
+                        @if (!isLoggedIn)
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-info mr-2" asp-controller="Doctor" asp-action="Login">Bác sĩ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-dark" asp-controller="Admin" asp-action="Login">Admin</a>
                             </li>
                         }
                     </ul>
@@ -207,12 +226,11 @@
             @RenderBody()
         </main>
     </div>
-
     <footer class="bg-light text-center p-3 mt-5">
         <div class="container">
             <div class="row py-3">
                 <div class="col-md-4 mb-2">
-                    <h5><i class="fas fa-hospital-alt mr-2"></i>Four Rock</h5>
+                    <h5><i class="fas fa-hospital-alt mr-2"></i>Four Rock Hospital</h5>
                     <p>Chăm sóc sức khỏe hàng đầu với công nghệ hiện đại và đội ngũ y bác sĩ chuyên nghiệp.</p>
                 </div>
                 <div class="col-md-4 mb-2">
@@ -240,11 +258,9 @@
             <p class="mb-0">&copy; 2025 Four Rock Hospital. All Rights Reserved. | Thiết kế bởi Four Rock Team</p>
         </div>
     </footer>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @if (!string.IsNullOrEmpty(patientName) && userRole == "Bệnh nhân")
     {
         <!-- CSKH Chat Icon & Box -->
@@ -305,7 +321,7 @@
                 e.stopPropagation();
                 closeChatbotChatBox();
                 let box = document.getElementById('cskhChatBox');
-                if (box.style.display === 'none') {
+                if (box.style.display === 'none' || box.style.display === '') {
                     box.style.display = 'block';
                     loadCSKHMessages();
                     setTimeout(() => document.getElementById('cskhChatInput').focus(), 200);
@@ -320,7 +336,7 @@
                 e.stopPropagation();
                 closeCSKHChatBox();
                 let box = document.getElementById('chatbotChatBox');
-                if (box.style.display === 'none') {
+                if (box.style.display === 'none' || box.style.display === '') {
                     box.style.display = 'block';
                     loadChatbotMessages();
                     setTimeout(() => document.getElementById('chatbotChatInput').focus(), 200);
@@ -331,12 +347,11 @@
             function closeChatbotChatBox() {
                 document.getElementById('chatbotChatBox').style.display = 'none';
             }
-
             // CSKH Chat logic
             function loadCSKHMessages() {
                 $("#cskhChatLoading").show();
                 $("#cskhChatMessages").empty().append('<div class="text-center text-muted my-2" id="cskhChatLoading">Đang tải hội thoại...</div>');
-                $.post('/api/cskh/getMessages', { user1: '@userId', user2: 1 }, function (res) {
+                $.post('/api/patient/getMessages', { user1: '@userId', user2: 1 }, function (res) {
                     $("#cskhChatMessages").empty();
                     if (res.success && res.messages.length > 0) {
                         res.messages.forEach(function (msg) {
@@ -358,8 +373,7 @@
                 var msg = $("#cskhChatInput").val().trim();
                 if (!msg) return false;
                 $("#cskhChatInput").prop("disabled", true);
-                $.post('/api/cskh/sendMessage', {
-                    sender_id: '@userId',
+                $.post('/api/patient/sendMessage', {
                     receiver_id: 1,
                     message: msg
                 }, function (res) {
@@ -374,42 +388,33 @@
                 });
                 return false;
             }
-
             // Chatbot Chat logic
             function loadChatbotMessages() {
                 $("#chatbotChatLoading").show();
                 $("#chatbotChatMessages").empty().append('<div class="text-center text-muted my-2" id="chatbotChatLoading">Đang tải hội thoại...</div>');
-                $.get('/api/chatbot/getMessages', function (res) {
-                    $("#chatbotChatMessages").empty();
-                    if (res.success && res.messages.length > 0) {
-                        res.messages.forEach(function (msg) {
-                            var align = msg.isUser ? "text-end" : "text-start";
-                            var bg = msg.isUser ? "bg-success text-white" : "bg-light";
-                            $("#chatbotChatMessages").append(
-                                `<div class="mb-2 ${align}">
-                                    <span class="d-inline-block px-3 py-2 rounded ${bg}" style="max-width:80%;word-break:break-word;">${msg.message}</span>
-                                </div>`
-                            );
-                        });
-                    } else {
-                        $("#chatbotChatMessages").append('<div class="text-center text-muted my-2">Chưa có hội thoại nào.</div>');
-                    }
-                    $("#chatbotChatMessages").scrollTop($("#chatbotChatMessages")[0].scrollHeight);
-                });
+                // Lưu lịch sử hội thoại phía client nếu muốn, ở đây chỉ clear box
+                $("#chatbotChatMessages").empty();
             }
             function sendChatbotMessage() {
                 var msg = $("#chatbotChatInput").val().trim();
                 if (!msg) return false;
                 $("#chatbotChatInput").prop("disabled", true);
-                $.post('/api/chatbot/sendMessage', {
-                    message: msg
-                }, function (res) {
-                    if (res.success) {
-                        $("#chatbotChatInput").val('');
-                        loadChatbotMessages();
-                    } else {
-                        alert(res.message || "Gửi tin nhắn thất bại!");
-                    }
+                // Hiển thị tin nhắn người dùng
+                $("#chatbotChatMessages").append(
+                    `<div class="mb-2 text-end">
+                        <span class="d-inline-block px-3 py-2 rounded bg-success text-white" style="max-width:80%;word-break:break-word;">${msg}</span>
+                    </div>`
+                );
+                $("#chatbotChatInput").val('');
+                $("#chatbotChatMessages").scrollTop($("#chatbotChatMessages")[0].scrollHeight);
+                // Gửi tới API
+                $.post('/api/chatbot', { message: msg }, function (res) {
+                    $("#chatbotChatMessages").append(
+                        `<div class="mb-2 text-start">
+                            <span class="d-inline-block px-3 py-2 rounded bg-light" style="max-width:80%;word-break:break-word;">${res.reply}</span>
+                        </div>`
+                    );
+                    $("#chatbotChatMessages").scrollTop($("#chatbotChatMessages")[0].scrollHeight);
                 }).always(function () {
                     $("#chatbotChatInput").prop("disabled", false);
                 });
