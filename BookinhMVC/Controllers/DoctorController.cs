@@ -79,7 +79,7 @@ namespace BookinhMVC.Controllers
                                           HoTenBenhNhan = bn.HoTen,
                                           DiaChi = bn.DiaChi,
                                           GioiTinh = bn.GioiTinh,
-                                          NgayGio = lh.NgayGio,
+                                          NgayGio = lh.NgayGio, // Fixed conversion
                                           TrieuChung = lh.TrieuChung,
                                           TrangThai = lh.TrangThai,
                                           AvailableTimes = null // sẽ gán sau
@@ -146,13 +146,13 @@ namespace BookinhMVC.Controllers
             var records = (from hs in _context.Set<HoSoBenhAn>()
                            join bn in _context.Set<BenhNhan>() on hs.MaBenhNhan equals bn.MaBenhNhan
                            join bs in _context.Set<BacSi>() on hs.MaBacSi equals bs.MaBacSi
-                           where hs.MaBacSi == maBacSi
-                           && (string.IsNullOrEmpty(search) || bn.HoTen.Contains(search))
+                           where (string.IsNullOrEmpty(search) || bn.HoTen.Contains(search))
                            select new MedicalRecordViewModel
                            {
                                MaHoSo = hs.MaHoSo,
                                TenBenhNhan = bn.HoTen,
                                TenBacSi = bs.HoTen,
+                               MaBacSi = hs.MaBacSi, // Thêm để biết bác sĩ nào tạo hồ sơ
                                NgayKham = hs.NgayKham,
                                ChanDoan = hs.ChanDoan,
                                PhuongAnDieuTri = hs.PhuongAnDieuTri
@@ -187,6 +187,7 @@ namespace BookinhMVC.Controllers
             };
             _context.Set<HoSoBenhAn>().Add(record);
             _context.SaveChanges();
+            TempData["Success"] = "Thêm hồ sơ bệnh án thành công!";
             return RedirectToAction("MedicalRecords");
         }
 
@@ -194,15 +195,26 @@ namespace BookinhMVC.Controllers
         public IActionResult UpdateMedicalRecord(int MaHoSo, string ChanDoan, string PhuongAnDieuTri)
         {
             if (!IsDoctorLoggedIn()) return RedirectToAction("Login");
+            var maBacSi = HttpContext.Session.GetInt32("MaBacSi");
+            
             var record = _context.Set<HoSoBenhAn>().FirstOrDefault(hs => hs.MaHoSo == MaHoSo);
             if (record == null)
             {
                 TempData["Error"] = "Không tìm thấy hồ sơ bệnh án!";
                 return RedirectToAction("MedicalRecords");
             }
+            
+            // Kiểm tra quyền chỉnh sửa - chỉ bác sĩ tạo hồ sơ mới được chỉnh sửa
+            if (record.MaBacSi != maBacSi)
+            {
+                TempData["Error"] = "Bạn không có quyền chỉnh sửa hồ sơ bệnh án này!";
+                return RedirectToAction("MedicalRecords");
+            }
+            
             record.ChanDoan = ChanDoan;
             record.PhuongAnDieuTri = PhuongAnDieuTri;
             _context.SaveChanges();
+            TempData["Success"] = "Cập nhật hồ sơ bệnh án thành công!";
             return RedirectToAction("MedicalRecords");
         }
 

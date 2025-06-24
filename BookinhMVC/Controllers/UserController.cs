@@ -24,25 +24,16 @@ namespace BookinhMVC.Controllers
             _passwordHasher = new PasswordHasher<NguoiDung>();
         }
 
+        // --- ĐĂNG KÝ & ĐĂNG NHẬP ---
+
         [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
+        public IActionResult Register() => View();
 
         [HttpPost]
         public async Task<IActionResult> Register(
-            string username,
-            string password,
-            string fullname,
-            DateTime dob,
-            string gender,
-            string phone,
-            string email,
-            string address,
-            string soBaoHiem)
+            string username, string password, string fullname, DateTime dob,
+            string gender, string phone, string email, string address, string soBaoHiem)
         {
-            // Kiểm tra tính duy nhất
             if (await _context.NguoiDungs.AnyAsync(u => u.TenDangNhap == username))
             {
                 ModelState.AddModelError("", "Tên đăng nhập đã tồn tại.");
@@ -59,7 +50,7 @@ namespace BookinhMVC.Controllers
                 return View();
             }
 
-            // Sinh OTP đăng ký
+            // Gửi OTP xác nhận đăng ký
             string otp = new Random().Next(100000, 999999).ToString();
             var registrationData = new RegistrationModel
             {
@@ -74,11 +65,9 @@ namespace BookinhMVC.Controllers
                 soBaoHiem = soBaoHiem,
                 otp = otp
             };
-
             HttpContext.Session.SetString("RegistrationData", JsonSerializer.Serialize(registrationData));
             HttpContext.Session.SetString("RegistrationOtp", otp);
 
-            // Gửi OTP qua email
             try
             {
                 var mail = new MailMessage
@@ -95,7 +84,6 @@ namespace BookinhMVC.Controllers
                     Credentials = new NetworkCredential("hienquangtranht1@gmail.com", "qewg mrze brpz lncf"),
                     EnableSsl = true
                 };
-
                 await smtp.SendMailAsync(mail);
             }
             catch (Exception ex)
@@ -107,10 +95,7 @@ namespace BookinhMVC.Controllers
         }
 
         [HttpGet]
-        public IActionResult VerifyOtp()
-        {
-            return View();
-        }
+        public IActionResult VerifyOtp() => View();
 
         [HttpPost]
         public async Task<IActionResult> VerifyOtp(string otp)
@@ -130,7 +115,7 @@ namespace BookinhMVC.Controllers
 
             var registrationData = JsonSerializer.Deserialize<RegistrationModel>(registrationJson);
 
-            // Kiểm tra các ràng buộc tính duy nhất
+            // Kiểm tra lại ràng buộc
             if (await _context.NguoiDungs.AnyAsync(u => u.TenDangNhap == registrationData.username))
             {
                 ModelState.AddModelError("", "Tên đăng nhập đã tồn tại.");
@@ -147,7 +132,6 @@ namespace BookinhMVC.Controllers
                 return RedirectToAction("Register");
             }
 
-            // Tạo đối tượng NguoiDung
             var user = new NguoiDung
             {
                 TenDangNhap = registrationData.username,
@@ -159,14 +143,12 @@ namespace BookinhMVC.Controllers
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Thêm user vào bảng NguoiDungs
                 _context.NguoiDungs.Add(user);
                 await _context.SaveChangesAsync();
 
-                // Tạo đối tượng BenhNhan với shared primary key: MaBenhNhan = user.MaNguoiDung
                 var patient = new BenhNhan
                 {
-                    MaBenhNhan = user.MaNguoiDung,  // Chia sẻ khóa chính từ NguoiDungs
+                    MaBenhNhan = user.MaNguoiDung,
                     HoTen = registrationData.fullname,
                     NgaySinh = registrationData.dob,
                     GioiTinh = registrationData.gender,
@@ -177,15 +159,12 @@ namespace BookinhMVC.Controllers
                     HinhAnhBenhNhan = "default.jpg",
                     NgayTao = DateTime.Now
                 };
-
                 _context.BenhNhans.Add(patient);
                 await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
-
                 HttpContext.Session.Remove("RegistrationData");
                 HttpContext.Session.Remove("RegistrationOtp");
-
                 return RedirectToAction("Login");
             }
             catch (Exception ex)
@@ -197,10 +176,7 @@ namespace BookinhMVC.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
+        public IActionResult Login() => View();
 
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password)
@@ -213,12 +189,9 @@ namespace BookinhMVC.Controllers
 
                 if (user.VaiTro == "Bệnh nhân")
                 {
-                    // Vì shared primary key, truy vấn BenhNhan theo MaBenhNhan = user.MaNguoiDung
                     var patient = await _context.BenhNhans.FirstOrDefaultAsync(b => b.MaBenhNhan == user.MaNguoiDung);
                     if (patient != null)
-                    {
                         HttpContext.Session.SetString("PatientName", patient.HoTen);
-                    }
                 }
                 return RedirectToAction("Index", "Home");
             }
@@ -234,6 +207,8 @@ namespace BookinhMVC.Controllers
             return RedirectToAction("Login", "User");
         }
 
+        // --- ĐỔI MẬT KHẨU (YÊU CẦU OTP) ---
+
         [HttpGet]
         public IActionResult ChangePassword()
         {
@@ -241,6 +216,46 @@ namespace BookinhMVC.Controllers
             if (string.IsNullOrEmpty(role) || role != "Bệnh nhân")
                 return RedirectToAction("Login", "User");
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendVerificationCode()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+                return Json(new { success = false, message = "Chưa đăng nhập." });
+
+            var patient = await _context.BenhNhans.FirstOrDefaultAsync(b => b.MaBenhNhan == userId);
+            if (patient == null || string.IsNullOrEmpty(patient.Email))
+                return Json(new { success = false, message = "Không tìm thấy email người dùng." });
+
+            string otp = new Random().Next(100000, 999999).ToString();
+            HttpContext.Session.SetString("ChangePasswordOtp", otp);
+            HttpContext.Session.SetString("ChangePasswordOtpTime", DateTime.Now.ToString());
+
+            try
+            {
+                var mail = new MailMessage
+                {
+                    From = new MailAddress("hienquangtranht1@gmail.com", "BỆNH VIỆN FOUR_ROCK"),
+                    Subject = "Mã OTP đổi mật khẩu",
+                    Body = $"Xin chào {patient.HoTen},\nMã OTP của bạn là: {otp}\nMã này có hiệu lực trong 5 phút.",
+                    IsBodyHtml = false
+                };
+                mail.To.Add(patient.Email);
+
+                using var smtp = new SmtpClient("smtp.gmail.com", 587)
+                {
+                    Credentials = new NetworkCredential("hienquangtranht1@gmail.com", "qewg mrze brpz lncf"),
+                    EnableSsl = true
+                };
+                await smtp.SendMailAsync(mail);
+                return Json(new { success = true, otp = otp });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Không thể gửi OTP: " + ex.Message });
+            }
         }
 
         [HttpPost]
@@ -298,6 +313,157 @@ namespace BookinhMVC.Controllers
             TempData["cp_message"] = "Đổi mật khẩu thành công!";
             return RedirectToAction("ChangePassword");
         }
+
+        // --- QUÊN MẬT KHẨU (OTP + ĐẶT LẠI) ---
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            ViewBag.Step = "email";
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(string email, string step, string otp)
+        {
+            if (step == "verify_otp")
+            {
+                // Xác nhận OTP
+                var sessionOtp = HttpContext.Session.GetString("ForgotPasswordOtp");
+                var sessionOtpTime = HttpContext.Session.GetString("ForgotPasswordOtpTime");
+                var sessionEmail = HttpContext.Session.GetString("ForgotPasswordEmail");
+                if (string.IsNullOrEmpty(sessionOtp) || string.IsNullOrEmpty(sessionOtpTime) || string.IsNullOrEmpty(sessionEmail))
+                {
+                    TempData["fp_error"] = "Phiên đặt lại mật khẩu đã hết hạn. Vui lòng thử lại.";
+                    ViewBag.Step = "email";
+                    return View();
+                }
+                if (otp != sessionOtp)
+                {
+                    TempData["fp_error"] = "Mã OTP không đúng.";
+                    ViewBag.Step = "otp";
+                    ViewBag.OtpPreview = sessionOtp.Substring(0, 1) + "*****";
+                    return View();
+                }
+                if (DateTime.TryParse(sessionOtpTime, out var otpTime) && (DateTime.Now - otpTime).TotalMinutes > 5)
+                {
+                    TempData["fp_error"] = "Mã OTP đã hết hạn.";
+                    ViewBag.Step = "email";
+                    return View();
+                }
+                // Đúng OTP, chuyển sang bước đặt lại mật khẩu
+                ViewBag.Step = "reset";
+                ViewBag.OtpValue = otp;
+                return View();
+            }
+            else
+            {
+                // Bước nhập email
+                var user = await _context.BenhNhans.FirstOrDefaultAsync(u => u.Email == email);
+                if (user == null)
+                {
+                    TempData["fp_error"] = "Email không tồn tại trong hệ thống.";
+                    ViewBag.Step = "email";
+                    return View();
+                }
+                // Gửi OTP
+                string otpCode = new Random().Next(100000, 999999).ToString();
+                HttpContext.Session.SetString("ForgotPasswordOtp", otpCode);
+                HttpContext.Session.SetString("ForgotPasswordOtpTime", DateTime.Now.ToString());
+                HttpContext.Session.SetString("ForgotPasswordEmail", email);
+
+                try
+                {
+                    var mail = new MailMessage
+                    {
+                        From = new MailAddress("hienquangtranht1@gmail.com", "BỆNH VIỆN FOUR_ROCK"),
+                        Subject = "Mã OTP đặt lại mật khẩu",
+                        Body = $"Xin chào {user.HoTen},\nMã OTP đặt lại mật khẩu của bạn là: {otpCode}\nMã này có hiệu lực trong 5 phút.",
+                        IsBodyHtml = false
+                    };
+                    mail.To.Add(email);
+
+                    using var smtp = new SmtpClient("smtp.gmail.com", 587)
+                    {
+                        Credentials = new NetworkCredential("hienquangtranht1@gmail.com", "qewg mrze brpz lncf"),
+                        EnableSsl = true
+                    };
+                    await smtp.SendMailAsync(mail);
+
+                    TempData["fp_message"] = "Mã OTP đã được gửi đến email của bạn.";
+                    ViewBag.Step = "otp";
+                    ViewBag.OtpPreview = otpCode.Substring(0, 1) + "*****";
+                    return View();
+                }
+                catch (Exception ex)
+                {
+                    TempData["fp_error"] = "Không thể gửi OTP: " + ex.Message;
+                    ViewBag.Step = "email";
+                    return View();
+                }
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(string newPassword, string confirmPassword, string otp)
+        {
+            var sessionOtp = HttpContext.Session.GetString("ForgotPasswordOtp");
+            var sessionOtpTime = HttpContext.Session.GetString("ForgotPasswordOtpTime");
+            var sessionEmail = HttpContext.Session.GetString("ForgotPasswordEmail");
+            if (string.IsNullOrEmpty(sessionOtp) || string.IsNullOrEmpty(sessionOtpTime) || string.IsNullOrEmpty(sessionEmail))
+            {
+                TempData["fp_error"] = "Phiên đặt lại mật khẩu đã hết hạn. Vui lòng thử lại.";
+                ViewBag.Step = "email";
+                return View("ForgotPassword");
+            }
+            if (otp != sessionOtp)
+            {
+                TempData["fp_error"] = "Mã OTP không đúng.";
+                ViewBag.Step = "otp";
+                ViewBag.OtpPreview = sessionOtp.Substring(0, 1) + "*****";
+                return View("ForgotPassword");
+            }
+            if (DateTime.TryParse(sessionOtpTime, out var otpTime) && (DateTime.Now - otpTime).TotalMinutes > 5)
+            {
+                TempData["fp_error"] = "Mã OTP đã hết hạn.";
+                ViewBag.Step = "email";
+                return View("ForgotPassword");
+            }
+            if (newPassword != confirmPassword)
+            {
+                TempData["fp_error"] = "Mật khẩu mới và xác nhận không khớp.";
+                ViewBag.Step = "reset";
+                ViewBag.OtpValue = otp;
+                return View("ForgotPassword");
+            }
+
+            var user = await _context.BenhNhans.FirstOrDefaultAsync(u => u.Email == sessionEmail);
+            if (user == null)
+            {
+                TempData["fp_error"] = "Không tìm thấy người dùng.";
+                ViewBag.Step = "email";
+                return View("ForgotPassword");
+            }
+            var nguoiDung = await _context.NguoiDungs.FirstOrDefaultAsync(n => n.MaNguoiDung == user.MaBenhNhan);
+            if (nguoiDung == null)
+            {
+                TempData["fp_error"] = "Không tìm thấy tài khoản.";
+                ViewBag.Step = "email";
+                return View("ForgotPassword");
+            }
+
+            nguoiDung.MatKhau = _passwordHasher.HashPassword(nguoiDung, newPassword);
+            await _context.SaveChangesAsync();
+
+            HttpContext.Session.Remove("ForgotPasswordOtp");
+            HttpContext.Session.Remove("ForgotPasswordOtpTime");
+            HttpContext.Session.Remove("ForgotPasswordEmail");
+
+            TempData["fp_message"] = "Đặt lại mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới.";
+            return RedirectToAction("Login");
+        }
+
+        // --- PROFILE & LỊCH HẸN ---
 
         [HttpGet]
         public async Task<IActionResult> UpdateProfile()
@@ -378,6 +544,7 @@ namespace BookinhMVC.Controllers
             return View();
         }
 
+        // --- ĐĂNG KÝ MODEL ---
         public class RegistrationModel
         {
             public string username { get; set; }

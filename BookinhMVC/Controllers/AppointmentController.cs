@@ -117,20 +117,43 @@ namespace BookinhMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Book(int selectedDoctorId, DateTime selectedDate, string selectedTime, string symptoms)
+        public async Task<IActionResult> Book(int selectedDoctorId, string selectedDate, string selectedTime, string symptoms)
         {
             ViewBag.Doctors = await _context.BacSis.Include(b => b.Khoa).ToListAsync();
             ViewBag.SelectedDoctorId = selectedDoctorId;
 
             int? selectedPatientId = HttpContext.Session.GetInt32("UserId");
 
-            if (selectedDoctorId == 0 || selectedPatientId == null || selectedDate == default || string.IsNullOrEmpty(selectedTime))
+            if (selectedDoctorId == 0 || selectedPatientId == null || string.IsNullOrEmpty(selectedDate) || string.IsNullOrEmpty(selectedTime))
             {
                 ViewBag.Message = "Vui lòng điền đầy đủ thông tin.";
                 return View();
             }
 
-            var appointmentDateTime = selectedDate.Date.Add(TimeSpan.Parse(selectedTime));
+            // Parse ngày và giờ đúng định dạng, không chuyển đổi múi giờ
+            DateTime date;
+            try
+            {
+                date = DateTime.ParseExact(selectedDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                ViewBag.Message = "Ngày không hợp lệ.";
+                return View();
+            }
+
+            TimeSpan time;
+            try
+            {
+                time = TimeSpan.Parse(selectedTime);
+            }
+            catch
+            {
+                ViewBag.Message = "Giờ không hợp lệ.";
+                return View();
+            }
+
+            var appointmentDateTime = date.Date.Add(time);
 
             // Kiểm tra trùng lịch
             var exists = await _context.LichHens.AnyAsync(l =>
