@@ -45,31 +45,6 @@
                             </select>
                             <button type="submit" class="btn btn-primary btn-sm">Cập nhật</button>
                         </form>
-                        <form method="post" asp-action="GetAvailableTimes" asp-controller="Doctor">
-                            <input type="hidden" name="id" value="@item.MaLich" />
-                            <select name="availableTime" class="form-control mb-1">
-                                @if (item.AvailableTimes?.Any() != true)
-                                {
-                                    <option value="">Không còn khung giờ trống</option>
-                                }
-                                else
-                                {
-                                    <option value="">Chọn giờ</option>
-                                    @foreach (var time in item.AvailableTimes)
-                                    {
-                                        if (TimeSpan.TryParse(time, out var timeSpan))
-                                        {
-                                            <option value="@time">@timeSpan.ToString(@"hh\:mm")</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@time">@(time.Length >= 5 ? time.Substring(0, 5) : time)</option>
-                                        }
-                                    }
-                                }
-                            </select>
-                            <button type="submit" class="btn btn-secondary btn-sm">Chọn giờ</button>
-                        </form>
                     </td>
                 </tr>
             }

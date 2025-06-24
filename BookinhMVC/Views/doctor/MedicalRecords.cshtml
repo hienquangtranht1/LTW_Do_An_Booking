@@ -3,10 +3,15 @@
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
     ViewBag.Title = "Danh sách bệnh án";
     var request = Context.Request;
+    var currentDoctorId = Context.Session.GetInt32("MaBacSi");
 }
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
 }
 <div class="container mt-4">
     <h2 class="mb-3" style="font-weight:bold;">Danh sách bệnh án</h2>
@@ -19,7 +24,7 @@
         <thead>
             <tr>
                 <th>Tên bệnh nhân</th>
-                <th>Tên bác sĩ</th>
+                <th>Bác sĩ tạo hồ sơ</th>
                 <th>Ngày khám</th>
                 <th>Chẩn đoán</th>
                 <th>Phác đồ điều trị</th>
@@ -30,14 +35,46 @@
             @foreach(var item in Model){
                 <tr>
                     <td>@item.TenBenhNhan</td>
-                    <td>@item.TenBacSi</td>
-                    <td>@item.NgayKham.ToString("yyyy-MM-dd")</td>
-                    <form method="post" asp-action="UpdateMedicalRecord" asp-controller="Doctor">
-                        <input type="hidden" name="MaHoSo" value="@item.MaHoSo" />
-                        <td><input type="text" name="ChanDoan" value="@item.ChanDoan" class="form-control" /></td>
-                        <td><input type="text" name="PhuongAnDieuTri" value="@item.PhuongAnDieuTri" class="form-control" /></td>
-                        <td><button type="submit" class="btn btn-primary btn-sm">Cập nhật</button></td>
-                    </form>
+                    <td>
+                        @item.TenBacSi
+                        @if (item.MaBacSi == currentDoctorId)
+                        {
+                            <span class="badge badge-success ml-2">Của bạn</span>
+                        }
+                    </td>
+                    <td>@item.NgayKham.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (item.MaBacSi == currentDoctorId)
+                        {
+                            <input type="text" id="chanDoan_@item.MaHoSo" value="@item.ChanDoan" class="form-control" />
+                        }
+                        else
+                        {
+                            <span>@item.ChanDoan</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.MaBacSi == currentDoctorId)
+                        {
+                            <input type="text" id="phuongAn_@item.MaHoSo" value="@item.PhuongAnDieuTri" class="form-control" />
+                        }
+                        else
+                        {
+                            <span>@item.PhuongAnDieuTri</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.MaBacSi == currentDoctorId)
+                        {
+                            <button type="button" class="btn btn-primary btn-sm" onclick="updateRecord(@item.MaHoSo)">
+                                Cập nhật
+                            </button>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Chỉ xem</span>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>
@@ -54,19 +91,24 @@
                     <div class="modal-body">
                         <input type="hidden" name="MaHoSo" value="0" />
                         <div class="form-group">
-                            <input type="text" name="TenBenhNhan" class="form-control" placeholder="Tên bệnh nhân (nhập mã hoặc chọn ở nơi khác)" required />
+                            <label>Tên bệnh nhân</label>
+                            <input type="text" name="TenBenhNhan" class="form-control" placeholder="Nhập tên bệnh nhân" required />
                         </div>
                         <div class="form-group">
+                            <label>Ngày khám</label>
                             <input type="date" name="NgayKham" class="form-control" required />
                         </div>
                         <div class="form-group">
-                            <input type="text" name="ChanDoan" class="form-control" placeholder="Chẩn đoán" required />
+                            <label>Chẩn đoán</label>
+                            <textarea name="ChanDoan" class="form-control" placeholder="Chẩn đoán" rows="3" required></textarea>
                         </div>
                         <div class="form-group">
-                            <input type="text" name="PhuongAnDieuTri" class="form-control" placeholder="Phác đồ điều trị" required />
+                            <label>Phác đồ điều trị</label>
+                            <textarea name="PhuongAnDieuTri" class="form-control" placeholder="Phác đồ điều trị" rows="3" required></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
                         <button type="submit" class="btn btn-success">Thêm hồ sơ</button>
                     </div>
                 </form>
@@ -74,6 +116,40 @@
         </div>
     </div>
 </div>
+
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function updateRecord(maHoSo) {
+    var chanDoan = document.getElementById('chanDoan_' + maHoSo).value;
+    var phuongAn = document.getElementById('phuongAn_' + maHoSo).value;
+    
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/Doctor/UpdateMedicalRecord';
+    
+    var maHoSoInput = document.createElement('input');
+    maHoSoInput.type = 'hidden';
+    maHoSoInput.name = 'MaHoSo';
+    maHoSoInput.value = maHoSo;
+    
+    var chanDoanInput = document.createElement('input');
+    chanDoanInput.type = 'hidden';
+    chanDoanInput.name = 'ChanDoan';
+    chanDoanInput.value = chanDoan;
+    
+    var phuongAnInput = document.createElement('input');
+    phuongAnInput.type = 'hidden';
+    phuongAnInput.name = 'PhuongAnDieuTri';
+    phuongAnInput.value = phuongAn;
+    
+    form.appendChild(maHoSoInput);
+    form.appendChild(chanDoanInput);
+    form.appendChild(phuongAnInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+</script> 
