@@ -635,7 +635,7 @@ namespace BookinhMVC.Controllers
         }
 
         // --------- CRUD LichLamViec ---------
-        public IActionResult WorkSchedules(int? doctorId)
+        public IActionResult WorkSchedules(int? doctorId, DateTime? weekStart)
         {
             var query = _context.LichLamViecs
                 .Include(l => l.BacSi)
@@ -645,9 +645,29 @@ namespace BookinhMVC.Controllers
             if (doctorId.HasValue)
                 query = query.Where(l => l.MaBacSi == doctorId.Value);
 
-            var schedules = query.OrderByDescending(l => l.NgayLamViec).ToList();
+            // Sửa: Tính lại tuần bắt đầu từ thứ 2 gần nhất của weekStart (hoặc hôm nay nếu null)
+            DateTime start;
+            if (weekStart.HasValue)
+            {
+                int daysFromMonday = ((int)weekStart.Value.DayOfWeek + 6) % 7;
+                start = weekStart.Value.AddDays(-daysFromMonday);
+            }
+            else
+            {
+                var today = DateTime.Today;
+                int daysFromMonday = ((int)today.DayOfWeek + 6) % 7;
+                start = today.AddDays(-daysFromMonday);
+            }
+
+            var schedules = query
+                .Where(l => l.NgayLamViec >= start && l.NgayLamViec <= start.AddDays(6))
+                .OrderBy(l => l.MaBacSi)
+                .ThenBy(l => l.NgayLamViec)
+                .ToList();
+
             ViewBag.Doctors = _context.BacSis.Include(bs => bs.NguoiDung).ToList();
             ViewBag.SelectedDoctor = doctorId;
+            ViewBag.WeekStart = start;
             return View("WorkSchedules", schedules);
         }
 
