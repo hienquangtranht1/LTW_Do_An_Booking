@@ -1,0 +1,23 @@
+@model BookinhMVC.Models.Khoa
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Departments";
+    ViewBag.Title = "Thêm Khoa";
+}
+<h2>Thêm Khoa</h2>
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<form asp-action="CreateDepartment" method="post">
+    @Html.AntiForgeryToken()
+    <div>
+        <label>Tên khoa</label>
+        <input asp-for="TenKhoa" class="form-control" />
+        @Html.ValidationMessageFor(m => m.TenKhoa)
+    </div>
+    <div>
+        <label>Mô tả</label>
+        <input asp-for="MoTa" class="form-control" />
+        @Html.ValidationMessageFor(m => m.MoTa)
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a asp-action="Departments" class="btn btn-secondary">Quay lại</a>
+</form>

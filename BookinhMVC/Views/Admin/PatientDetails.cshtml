@@ -1,0 +1,63 @@
+@model BookinhMVC.Models.BenhNhan
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Patients";
+    ViewBag.Title = "Chi tiết Bệnh nhân";
+}
+<h2>Chi tiết Bệnh nhân</h2>
+<table class="table">
+    <tr>
+        <th>Mã bệnh nhân</th>
+        <td>@Model.MaBenhNhan</td>
+    </tr>
+    <tr>
+        <th>Mã người dùng</th>
+        <td>@Model.MaBenhNhan</td>
+    </tr>
+    <tr>
+        <th>Họ tên</th>
+        <td>@Model.HoTen</td>
+    </tr>
+    <tr>
+        <th>Ngày sinh</th>
+        <td>@Model.NgaySinh.ToString("dd/MM/yyyy")</td>
+    </tr>
+    <tr>
+        <th>Giới tính</th>
+        <td>@Model.GioiTinh</td>
+    </tr>
+    <tr>
+        <th>Số điện thoại</th>
+        <td>@Model.SoDienThoai</td>
+    </tr>
+    <tr>
+        <th>Email</th>
+        <td>@Model.Email</td>
+    </tr>
+    <tr>
+        <th>Địa chỉ</th>
+        <td>@Model.DiaChi</td>
+    </tr>
+    <tr>
+        <th>Số bảo hiểm</th>
+        <td>@Model.SoBaoHiem</td>
+    </tr>
+    <tr>
+        <th>Hình ảnh</th>
+        <td>
+            @if (!string.IsNullOrEmpty(Model.HinhAnhBenhNhan))
+            {
+                <img src="/uploads/@Model.HinhAnhBenhNhan" style="max-width:120px;max-height:120px" />
+            }
+            else
+            {
+                <span>Chưa có hình</span>
+            }
+        </td>
+    </tr>
+    <tr>
+        <th>Ngày tạo</th>
+        <td>@Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</td>
+    </tr>
+</table>
+<a href="/Admin/Patients" class="btn btn-secondary">Quay lại</a>

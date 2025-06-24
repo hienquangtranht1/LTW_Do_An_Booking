@@ -1,0 +1,240 @@
+﻿@model IEnumerable<BookinhMVC.Models.LichLamViec>
+@{
+    Layout = "_AdminLayout";
+    var doctors = ViewBag.Doctors as List<BookinhMVC.Models.BacSi>;
+    int? selectedDoctor = ViewBag.SelectedDoctor as int?;
+    
+    // Xử lý tuần hiện tại
+    DateTime weekStart;
+    if (ViewBag.WeekStart != null)
+    {
+        weekStart = (DateTime)ViewBag.WeekStart;
+    }
+    else
+    {
+        var today = DateTime.Today;
+        int daysFromMonday = ((int)today.DayOfWeek + 6) % 7;
+        weekStart = today.AddDays(-daysFromMonday);
+    }
+    
+    var weekEnd = weekStart.AddDays(6);
+    var daysOfWeek = new[] { "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật" };
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-calendar-alt me-2"></i>Lịch làm việc bác sĩ</h2>
+        <a href="@Url.Action("CreateWorkSchedule", new { doctorId = selectedDoctor, date = weekStart.ToString("yyyy-MM-dd") })" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>Thêm lịch làm việc
+        </a>
+    </div>
+
+    <!-- Bộ lọc và điều hướng tuần -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Chọn bác sĩ:</label>
+                    <select name="doctorId" class="form-select">
+                        <option value="">-- Tất cả bác sĩ --</option>
+                        @foreach (var bs in doctors)
+                        {
+                            <option value="@bs.MaBacSi" selected="@(selectedDoctor == bs.MaBacSi ? "selected" : null)">
+                                @bs.HoTen (@bs.NguoiDung?.TenDangNhap)
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tuần:</label>
+                    <div class="input-group">
+                        <button type="submit" name="weekStart" value="@weekStart.AddDays(-7).ToString("yyyy-MM-dd")" 
+                                class="btn btn-outline-primary">
+                            <i class="fas fa-chevron-left"></i> Tuần trước
+                        </button>
+                        <input type="date" name="weekStart" value="@weekStart.ToString("yyyy-MM-dd")" 
+                               class="form-control text-center">
+                        <button type="submit" name="weekStart" value="@weekStart.AddDays(7).ToString("yyyy-MM-dd")" 
+                                class="btn btn-outline-primary">
+                            Tuần sau <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-1"></i>Lọc
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Thông tin tuần hiện tại -->
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Đang xem tuần từ <strong>@weekStart.ToString("dd/MM/yyyy")</strong> 
+        đến <strong>@weekEnd.ToString("dd/MM/yyyy")</strong>
+    </div>
+
+    <!-- Bảng lịch làm việc -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 150px;" class="text-center">Bác sĩ</th>
+                            @for (int i = 0; i < 7; i++)
+                            {
+                                var currentDay = weekStart.AddDays(i);
+                                var isToday = currentDay.Date == DateTime.Today;
+                                <th class="text-center @(isToday ? "bg-warning text-dark" : "")">
+                                    <div>@daysOfWeek[i]</div>
+                                    <small>@currentDay.ToString("dd/MM")</small>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var displayDoctors = selectedDoctor.HasValue 
+                                ? doctors.Where(d => d.MaBacSi == selectedDoctor) 
+                                : doctors;
+                        }
+                        
+                        @foreach (var doctor in displayDoctors)
+                        {
+                            <tr>
+                                <td class="align-middle">
+                                    <div class="text-center">
+                                        <strong>@doctor.HoTen</strong><br />
+                                        <small class="text-muted">@doctor.Khoa?.TenKhoa</small><br />
+                                        <small class="text-info">@doctor.NguoiDung?.TenDangNhap</small>
+                                    </div>
+                                </td>
+                                @for (int i = 0; i < 7; i++)
+                                {
+                                    var day = weekStart.AddDays(i);
+                                    var schedules = Model.Where(x => x.MaBacSi == doctor.MaBacSi && x.NgayLamViec.Date == day.Date).ToList();
+                                    var isToday = day.Date == DateTime.Today;
+                                    
+                                    <td class="text-center p-2 @(isToday ? "bg-light" : "")" style="min-width: 140px;">
+                                        @if (schedules.Any())
+                                        {
+                                            @foreach (var schedule in schedules)
+                                            {
+                                                <div class="mb-2 p-2 border rounded @(schedule.TrangThai == "Đã xác nhận" ? "bg-success bg-opacity-10 border-success" : "bg-warning bg-opacity-10 border-warning")">
+                                                    <div class="fw-bold">
+                                                        @schedule.GioBatDau.ToString(@"hh\:mm") - @schedule.GioKetThuc.ToString(@"hh\:mm")
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <span class="badge @(schedule.TrangThai == "Đã xác nhận" ? "bg-success" : "bg-warning text-dark")">
+                                                            @schedule.TrangThai
+                                                        </span>
+                                                    </div>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a href="@Url.Action("EditWorkSchedule", new { id = schedule.MaLich })" 
+                                                           class="btn btn-outline-primary btn-sm" title="Sửa">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        @if (schedule.TrangThai != "Đã xác nhận")
+                                                        {
+                                                            <form method="post" asp-action="ConfirmWorkSchedule" class="d-inline">
+                                                                <input type="hidden" name="id" value="@schedule.MaLich" />
+                                                                <button type="submit" class="btn btn-outline-success btn-sm" title="Xác nhận">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        <a href="@Url.Action("DeleteWorkSchedule", new { id = schedule.MaLich })" 
+                                                           class="btn btn-outline-danger btn-sm" title="Xóa">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted">
+                                                <i class="fas fa-plus-circle"></i><br />
+                                                <small>Chưa có lịch</small><br />
+                                                <a href="@Url.Action("CreateWorkSchedule", new { doctorId = doctor.MaBacSi, date = day.ToString("yyyy-MM-dd") })" 
+                                                   class="btn btn-outline-success btn-sm mt-1">
+                                                    Thêm ca
+                                                </a>
+                                            </div>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                        
+                        @if (!displayDoctors.Any())
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">Không có bác sĩ nào</h5>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thống kê -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-user-md fa-2x text-primary mb-2"></i>
+                    <h5>@displayDoctors.Count()</h5>
+                    <small class="text-muted">Bác sĩ</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-calendar-check fa-2x text-success mb-2"></i>
+                    <h5>@Model.Count(s => s.TrangThai == "Đã xác nhận")</h5>
+                    <small class="text-muted">Ca đã xác nhận</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-calendar-times fa-2x text-warning mb-2"></i>
+                    <h5>@Model.Count(s => s.TrangThai == "Chưa xác nhận")</h5>
+                    <small class="text-muted">Ca chưa xác nhận</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-calendar fa-2x text-info mb-2"></i>
+                    <h5>@Model.Count()</h5>
+                    <small class="text-muted">Tổng ca làm việc</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.table td {
+    vertical-align: middle;
+}
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+.badge {
+    font-size: 0.7em;
+}
+</style>

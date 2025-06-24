@@ -1,0 +1,28 @@
+@model BookinhMVC.Models.LichHen
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Appointments";
+    ViewBag.Title = "Sửa Lịch hẹn";
+}
+<h2>Sửa Lịch hẹn</h2>
+<form asp-action="EditAppointment" method="post">
+    <input type="hidden" asp-for="MaLich" />
+    <div class="mb-2">
+        <label>Mã bệnh nhân</label>
+        <input asp-for="MaBenhNhan" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Mã bác sĩ</label>
+        <input asp-for="MaBacSi" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Ngày giờ</label>
+        <input asp-for="NgayGio" class="form-control" type="datetime-local" />
+    </div>
+    <div class="mb-2">
+        <label>Trạng thái</label>
+        <input asp-for="TrangThai" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a href="/Admin/Appointments" class="btn btn-secondary">Quay lại</a>
+</form> 

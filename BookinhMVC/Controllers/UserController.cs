@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.IO;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace BookinhMVC.Controllers
 {
@@ -358,6 +359,23 @@ namespace BookinhMVC.Controllers
             await _context.SaveChangesAsync();
             TempData["notification"] = "Cập nhật thông tin thành công!";
             return RedirectToAction("UpdateProfile");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Appointments()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+            var lichHens = await _context.LichHens
+                .Include(lh => lh.BacSi)
+                .Where(lh => lh.MaBenhNhan == userId)
+                .OrderByDescending(lh => lh.NgayGio)
+                .ToListAsync();
+            ViewBag.LichHens = lichHens;
+            return View();
         }
 
         public class RegistrationModel

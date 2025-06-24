@@ -12,8 +12,11 @@
 }
 
 <div class="container my-5">
-    <h2 class="text-center mb-4">Tìm kiếm bác sĩ</h2>
-    <form method="get" asp-action="Doctors" asp-controller="Home" class="row g-3 mb-4 justify-content-center">
+    <div class="doctors-hero text-center mb-5">
+        <h2 class="doctors-title">Đội ngũ bác sĩ chuyên nghiệp</h2>
+        <p class="doctors-lead">Tìm kiếm và lựa chọn bác sĩ phù hợp với nhu cầu của bạn</p>
+    </div>
+    <form method="get" asp-action="Doctors" asp-controller="Home" class="row g-3 mb-4 justify-content-center doctors-search-form">
         <div class="col-md-4">
             <input type="text" name="name" value="@searchName" class="form-control" placeholder="Nhập tên bác sĩ..." />
         </div>
@@ -39,19 +42,17 @@
         {
             foreach (var doctor in Model)
             {
-                <div class="col-6 col-md-4 col-lg-3 mb-4">
-                    <a href="@Url.Action("Book", "Appointment", new { selectedDoctorId = doctor.MaBacSi })" class="text-decoration-none">
-                        <div class="card h-100 shadow-sm text-center">
-                            <img src="@(string.IsNullOrEmpty(doctor.HinhAnhBacSi) ? Url.Content("~/images/doctors/default.jpg") : Url.Content("~/uploads/" + doctor.HinhAnhBacSi))"
-                                 class="card-img-top mx-auto mt-3 rounded-circle"
-                                 style="width:120px;height:120px;object-fit:cover;"
-                                 alt="@doctor.HoTen" />
-                            <div class="card-body">
-                                <h5 class="card-title mb-1">@doctor.HoTen</h5>
-                                <p class="card-text text-muted mb-0" style="font-size:0.95em;">@doctor.Khoa?.TenKhoa</p>
-                            </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="doctor-card card h-100 shadow-sm text-center p-3">
+                        <img src="@(string.IsNullOrEmpty(doctor.HinhAnhBacSi) ? Url.Content("~/images/doctors/default.jpg") : Url.Content("~/uploads/" + doctor.HinhAnhBacSi))"
+                             class="doctor-img card-img-top mx-auto mb-3"
+                             alt="@doctor.HoTen" />
+                        <div class="card-body p-0">
+                            <h5 class="doctor-name card-title mb-1">@doctor.HoTen</h5>
+                            <span class="doctor-dept badge mb-2">@doctor.Khoa?.TenKhoa</span>
+                            <a href="@Url.Action("Book", "Appointment", new { selectedDoctorId = doctor.MaBacSi })" class="btn btn-outline-primary btn-sm w-100 mt-2">Đặt lịch</a>
                         </div>
-                    </a>
+                    </div>
                 </div>
             }
         }
@@ -61,3 +62,80 @@
         }
     </div>
 </div>
+
+<style>
+.doctors-hero {
+    margin-bottom: 2.5rem;
+}
+.doctors-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+}
+.doctors-lead {
+    font-size: 1.15rem;
+    color: #2563eb;
+    opacity: 0.85;
+}
+.doctors-search-form .form-control, .doctors-search-form .form-select {
+    border-radius: 1rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+}
+.doctors-search-form .btn-primary {
+    border-radius: 1rem;
+    font-weight: 600;
+    padding: 0.75rem 0;
+}
+.doctor-card {
+    border-radius: 1.25rem;
+    box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    background: #fff;
+    cursor: pointer;
+}
+.doctor-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(37,99,235,0.15);
+}
+.doctor-img {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #e0f2fe;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+    margin-bottom: 0.5rem;
+}
+.doctor-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 0.25rem;
+}
+.doctor-dept {
+    background: #e0f2fe;
+    color: #2563eb;
+    font-size: 0.95em;
+    border-radius: 0.75rem;
+    padding: 0.3em 1em;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
+.btn-outline-primary {
+    border-radius: 1rem;
+    font-weight: 600;
+    border-width: 2px;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-outline-primary:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+@@media (max-width: 767px) {
+    .doctors-title { font-size: 1.3rem; }
+    .doctor-img { width: 80px; height: 80px; }
+}
+</style>

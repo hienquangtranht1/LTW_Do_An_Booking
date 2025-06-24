@@ -1,0 +1,13 @@
+@model BookinhMVC.Models.BenhNhan
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Patients";
+    ViewBag.Title = "Xóa Bệnh nhân";
+}
+<h2>Xóa Bệnh nhân</h2>
+<p>Bạn có chắc chắn muốn xóa bệnh nhân <b>@Model.HoTen</b>?</p>
+<form asp-action="DeletePatient" method="post">
+    <input type="hidden" asp-for="MaBenhNhan" />
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a href="/Admin/Patients" class="btn btn-secondary">Hủy</a>
+</form> 

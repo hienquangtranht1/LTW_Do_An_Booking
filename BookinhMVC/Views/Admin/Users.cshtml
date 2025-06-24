@@ -1,0 +1,26 @@
+@model IEnumerable<BookinhMVC.Models.NguoiDung>
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Users";
+    ViewBag.Title = "Quản lý Người dùng";
+}
+<h2>Quản lý Người dùng</h2>
+<a href="/Admin/CreateUser" class="btn btn-success mb-2">Thêm mới</a>
+<table class="table table-bordered">
+    <tr>
+        <th>ID</th><th>Tên đăng nhập</th><th>Vai trò</th><th>Ngày tạo</th><th>Thao tác</th>
+    </tr>
+    @foreach(var u in Model) {
+        <tr>
+            <td>@u.MaNguoiDung</td>
+            <td>@u.TenDangNhap</td>
+            <td>@u.VaiTro</td>
+            <td>@u.NgayTao.ToString("dd/MM/yyyy")</td>
+            <td>
+                <a href="/Admin/UserDetails/@u.MaNguoiDung" class="btn btn-info btn-sm">Xem</a>
+                <a href="/Admin/EditUser/@u.MaNguoiDung" class="btn btn-warning btn-sm">Sửa</a>
+                <a href="/Admin/DeleteUser/@u.MaNguoiDung" class="btn btn-danger btn-sm">Xóa</a>
+            </td>
+        </tr>
+    }
+</table>

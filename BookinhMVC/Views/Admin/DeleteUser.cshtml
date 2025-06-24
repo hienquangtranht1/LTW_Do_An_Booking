@@ -1,0 +1,13 @@
+@model BookinhMVC.Models.NguoiDung
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Users";
+    ViewBag.Title = "Xóa Người dùng";
+}
+<h2>Xóa Người dùng</h2>
+<p>Bạn có chắc chắn muốn xóa người dùng <b>@Model.TenDangNhap</b>?</p>
+<form asp-action="DeleteUser" method="post">
+    <input type="hidden" asp-for="MaNguoiDung" />
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a href="/Admin/Users" class="btn btn-secondary">Hủy</a>
+</form> 

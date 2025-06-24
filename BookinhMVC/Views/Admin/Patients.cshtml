@@ -1,0 +1,27 @@
+@model IEnumerable<BookinhMVC.Models.BenhNhan>
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Patients";
+    ViewBag.Title = "Quản lý Bệnh nhân";
+}
+<h2>Quản lý Bệnh nhân</h2>
+<a href="/Admin/CreatePatient" class="btn btn-success mb-2">Thêm mới</a>
+<table class="table table-bordered">
+    <tr>
+        <th>ID</th><th>Họ tên</th><th>Giới tính</th><th>SĐT</th><th>Email</th><th>Thao tác</th>
+    </tr>
+    @foreach(var p in Model) {
+        <tr>
+            <td>@p.MaBenhNhan</td>
+            <td>@p.HoTen</td>
+            <td>@p.GioiTinh</td>
+            <td>@p.SoDienThoai</td>
+            <td>@p.Email</td>
+            <td>
+                <a href="/Admin/PatientDetails/@p.MaBenhNhan" class="btn btn-info btn-sm">Xem</a>
+                <a href="/Admin/EditPatient/@p.MaBenhNhan" class="btn btn-warning btn-sm">Sửa</a>
+                <a href="/Admin/DeletePatient/@p.MaBenhNhan" class="btn btn-danger btn-sm">Xóa</a>
+            </td>
+        </tr>
+    }
+</table> 

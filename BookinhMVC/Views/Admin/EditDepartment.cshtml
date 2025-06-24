@@ -1,0 +1,20 @@
+@model BookinhMVC.Models.Khoa
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Departments";
+    ViewBag.Title = "Sửa Khoa";
+}
+<h2>Sửa Khoa</h2>
+<form asp-action="EditDepartment" method="post">
+    <input type="hidden" asp-for="MaKhoa" />
+    <div class="mb-2">
+        <label>Tên khoa</label>
+        <input asp-for="TenKhoa" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Mô tả</label>
+        <input asp-for="MoTa" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a href="/Admin/Departments" class="btn btn-secondary">Quay lại</a>
+</form> 

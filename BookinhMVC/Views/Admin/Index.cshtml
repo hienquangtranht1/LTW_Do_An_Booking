@@ -1,0 +1,74 @@
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Dashboard";
+    ViewBag.Title = "Admin Dashboard";
+    var users = ViewBag.UserCount ?? 0;
+    var doctors = ViewBag.DoctorCount ?? 0;
+    var patients = ViewBag.PatientCount ?? 0;
+    var departments = ViewBag.DepartmentCount ?? 0;
+    var appointments = ViewBag.AppointmentCount ?? 0;
+    var reviews = ViewBag.ReviewCount ?? 0;
+}
+<h2>Admin Dashboard</h2>
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="card text-bg-primary mb-3"><div class="card-body"><h5 class="card-title">Người dùng</h5><p class="card-text" id="userCount">@users</p></div></div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-bg-success mb-3"><div class="card-body"><h5 class="card-title">Bác sĩ</h5><p class="card-text" id="doctorCount">@doctors</p></div></div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-bg-warning mb-3"><div class="card-body"><h5 class="card-title">Bệnh nhân</h5><p class="card-text" id="patientCount">@patients</p></div></div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-bg-info mb-3"><div class="card-body"><h5 class="card-title">Khoa</h5><p class="card-text" id="departmentCount">@departments</p></div></div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-bg-secondary mb-3"><div class="card-body"><h5 class="card-title">Lịch hẹn</h5><p class="card-text" id="appointmentCount">@appointments</p></div></div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-bg-danger mb-3"><div class="card-body"><h5 class="card-title">Đánh giá</h5><p class="card-text" id="reviewCount">@reviews</p></div></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <canvas id="pieChart"></canvas>
+    </div>
+    <div class="col-md-6">
+        <canvas id="barChart"></canvas>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const stats = {
+    users: @users,
+    doctors: @doctors,
+    patients: @patients,
+    departments: @departments,
+    appointments: @appointments,
+    reviews: @reviews
+};
+// Pie chart
+new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+        labels: ['Người dùng', 'Bác sĩ', 'Bệnh nhân', 'Khoa', 'Lịch hẹn', 'Đánh giá'],
+        datasets: [{
+            data: [stats.users, stats.doctors, stats.patients, stats.departments, stats.appointments, stats.reviews],
+            backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#0dcaf0', '#6c757d', '#dc3545']
+        }]
+    }
+});
+// Bar chart
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Người dùng', 'Bác sĩ', 'Bệnh nhân', 'Khoa', 'Lịch hẹn', 'Đánh giá'],
+        datasets: [{
+            label: 'Số lượng',
+            data: [stats.users, stats.doctors, stats.patients, stats.departments, stats.appointments, stats.reviews],
+            backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#0dcaf0', '#6c757d', '#dc3545']
+        }]
+    }
+});
+</script>
