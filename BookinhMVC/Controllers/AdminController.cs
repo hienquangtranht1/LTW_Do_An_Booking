@@ -305,10 +305,27 @@ namespace BookinhMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditDoctor(int id, int maNguoiDung, string hoTen, int maKhoa, string soDienThoai, string email, string hinhAnhBacSi, string moTa)
+        public async Task<IActionResult> EditDoctor(int id, int maNguoiDung, string hoTen, int maKhoa, string soDienThoai, string email, string hinhAnhBacSi, string moTa, IFormFile file)
         {
             var existing = await _context.BacSis.AsNoTracking().FirstOrDefaultAsync(b => b.MaBacSi == id);
             if (existing == null) return NotFound();
+
+            // Xử lý upload file nếu có
+            string fileName = hinhAnhBacSi; // Giữ tên file cũ nếu không upload file mới
+            if (file != null && file.Length > 0)
+            {
+                var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                if (!Directory.Exists(uploads))
+                    Directory.CreateDirectory(uploads);
+
+                fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                var filePath = Path.Combine(uploads, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+            }
+
             var model = new BacSi
             {
                 MaBacSi = id,
@@ -317,7 +334,7 @@ namespace BookinhMVC.Controllers
                 MaKhoa = maKhoa,
                 SoDienThoai = soDienThoai,
                 Email = email,
-                HinhAnhBacSi = hinhAnhBacSi,
+                HinhAnhBacSi = fileName,
                 MoTa = moTa,
                 NgayTao = existing.NgayTao
             };
