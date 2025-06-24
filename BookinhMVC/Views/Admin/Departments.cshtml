@@ -1,0 +1,25 @@
+@model IEnumerable<BookinhMVC.Models.Khoa>
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Departments";
+    ViewBag.Title = "Quản lý Khoa";
+}
+<h2>Quản lý Khoa</h2>
+<a href="/Admin/CreateDepartment" class="btn btn-success mb-2">Thêm mới</a>
+<table class="table table-bordered">
+    <tr>
+        <th>ID</th><th>Tên khoa</th><th>Mô tả</th><th>Thao tác</th>
+    </tr>
+    @foreach(var k in Model) {
+        <tr>
+            <td>@k.MaKhoa</td>
+            <td>@k.TenKhoa</td>
+            <td>@k.MoTa</td>
+            <td>
+                <a href="/Admin/DepartmentDetails/@k.MaKhoa" class="btn btn-info btn-sm">Xem</a>
+                <a href="/Admin/EditDepartment/@k.MaKhoa" class="btn btn-warning btn-sm">Sửa</a>
+                <a href="/Admin/DeleteDepartment/@k.MaKhoa" class="btn btn-danger btn-sm">Xóa</a>
+            </td>
+        </tr>
+    }
+</table> 

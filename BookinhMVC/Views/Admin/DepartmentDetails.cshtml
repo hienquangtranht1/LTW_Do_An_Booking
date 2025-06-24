@@ -1,0 +1,13 @@
+@model BookinhMVC.Models.Khoa
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Departments";
+    ViewBag.Title = "Chi tiết Khoa";
+}
+<h2>Chi tiết Khoa</h2>
+<ul>
+    <li>ID: @Model.MaKhoa</li>
+    <li>Tên khoa: @Model.TenKhoa</li>
+    <li>Mô tả: @Model.MoTa</li>
+</ul>
+<a href="/Admin/Departments" class="btn btn-secondary">Quay lại</a> 

@@ -1,0 +1,23 @@
+@model BookinhMVC.Models.NguoiDung
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Users";
+    ViewBag.Title = "Thêm Người dùng";
+}
+<h2>Thêm Người dùng</h2>
+<form asp-action="CreateUser" method="post">
+    <div class="mb-2">
+        <label>Tên đăng nhập</label>
+        <input asp-for="TenDangNhap" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Mật khẩu</label>
+        <input asp-for="MatKhau" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Vai trò</label>
+        <input asp-for="VaiTro" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a href="/Admin/Users" class="btn btn-secondary">Quay lại</a>
+</form> 

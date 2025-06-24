@@ -1,0 +1,31 @@
+@model BookinhMVC.Models.BacSi
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Doctors";
+    ViewBag.Title = "Chi tiết Bác sĩ";
+}
+<h2>Chi tiết Bác sĩ</h2>
+<table class="table">
+    <tr><th>Mã bác sĩ</th><td>@Model.MaBacSi</td></tr>
+    <tr><th>Tên đăng nhập</th><td>@Model.NguoiDung?.TenDangNhap</td></tr>
+    <tr><th>Họ tên</th><td>@Model.HoTen</td></tr>
+    <tr><th>Khoa</th><td>@Model.Khoa?.TenKhoa</td></tr>
+    <tr><th>Số điện thoại</th><td>@Model.SoDienThoai</td></tr>
+    <tr><th>Email</th><td>@Model.Email</td></tr>
+    <tr>
+        <th>Hình ảnh</th>
+        <td>
+            @if (!string.IsNullOrEmpty(Model.HinhAnhBacSi))
+            {
+                <img src="/uploads/@Model.HinhAnhBacSi" style="max-width:120px;max-height:120px" />
+            }
+            else
+            {
+                <span>Chưa có hình</span>
+            }
+        </td>
+    </tr>
+    <tr><th>Mô tả</th><td>@Model.MoTa</td></tr>
+    <tr><th>Ngày tạo</th><td>@Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</td></tr>
+</table>
+<a href="/Admin/Doctors" class="btn btn-secondary">Quay lại</a>

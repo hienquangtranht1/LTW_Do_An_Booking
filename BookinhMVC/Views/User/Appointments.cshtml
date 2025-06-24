@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Lịch hẹn của tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lichHens = ViewBag.LichHens as List<BookinhMVC.Models.LichHen>;
+}
+
+<div class="container py-5">
+    <h2 class="mb-4 text-center">Lịch hẹn của tôi với bác sĩ</h2>
+    @if (lichHens != null && lichHens.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ngày giờ</th>
+                        <th>Bác sĩ</th>
+                        <th>Triệu chứng</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var lh in lichHens)
+                {
+                    <tr>
+                        <td>@lh.NgayGio.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@lh.BacSi?.HoTen</td>
+                        <td>@lh.TrieuChung</td>
+                        <td>@lh.TrangThai</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">Bạn chưa có lịch hẹn nào.</div>
+    }
+</div> 

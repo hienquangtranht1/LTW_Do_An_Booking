@@ -1,0 +1,46 @@
+@model dynamic
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Doctors";
+    ViewBag.Title = "Thêm Bác sĩ";
+    var khoas = ViewBag.Khoas as List<BookinhMVC.Models.Khoa>;
+}
+<h2>Thêm Bác sĩ</h2>
+<form asp-action="CreateDoctor" method="post" enctype="multipart/form-data">
+    <div class="mb-2">
+        <label>Tên đăng nhập</label>
+        <input name="tenDangNhap" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Họ tên</label>
+        <input name="hoTen" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Khoa</label>
+        <select name="maKhoa" class="form-control" required>
+            <option value="">-- Chọn khoa --</option>
+            @foreach (var k in khoas)
+            {
+                <option value="@k.MaKhoa">@k.TenKhoa</option>
+            }
+        </select>
+    </div>
+    <div class="mb-2">
+        <label>Số điện thoại</label>
+        <input name="soDienThoai" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Email</label>
+        <input name="email" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Hình ảnh</label>
+        <input type="file" name="file" class="form-control" accept="image/*" />
+    </div>
+    <div class="mb-2">
+        <label>Mô tả</label>
+        <input name="moTa" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a href="/Admin/Doctors" class="btn btn-secondary">Quay lại</a>
+</form>

@@ -1,0 +1,14 @@
+@model BookinhMVC.Models.NguoiDung
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Users";
+    ViewBag.Title = "Chi tiết Người dùng";
+}
+<h2>Chi tiết Người dùng</h2>
+<ul>
+    <li>ID: @Model.MaNguoiDung</li>
+    <li>Tên đăng nhập: @Model.TenDangNhap</li>
+    <li>Vai trò: @Model.VaiTro</li>
+    <li>Ngày tạo: @Model.NgayTao.ToString("dd/MM/yyyy")</li>
+</ul>
+<a href="/Admin/Users" class="btn btn-secondary">Quay lại</a> 

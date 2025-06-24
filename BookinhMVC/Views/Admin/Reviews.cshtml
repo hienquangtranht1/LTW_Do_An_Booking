@@ -1,0 +1,28 @@
+@model IEnumerable<BookinhMVC.Models.DanhGia>
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Reviews";
+    ViewBag.Title = "Quản lý Đánh giá";
+}
+<h2>Quản lý Đánh giá</h2>
+<a href="/Admin/CreateReview" class="btn btn-success mb-2">Thêm mới</a>
+<table class="table table-bordered">
+    <tr>
+        <th>ID</th><th>Bác sĩ</th><th>Bệnh nhân</th><th>Điểm</th><th>Nhận xét</th><th>Ngày</th><th>Thao tác</th>
+    </tr>
+    @foreach(var r in Model) {
+        <tr>
+            <td>@r.MaDanhGia</td>
+            <td>@r.BacSi?.HoTen</td>
+            <td>@r.BenhNhan?.HoTen</td>
+            <td>@r.DiemDanhGia</td>
+            <td>@r.NhanXet</td>
+            <td>@r.NgayDanhGia.ToString("dd/MM/yyyy")</td>
+            <td>
+                <a href="/Admin/ReviewDetails/@r.MaDanhGia" class="btn btn-info btn-sm">Xem</a>
+                <a href="/Admin/EditReview/@r.MaDanhGia" class="btn btn-warning btn-sm">Sửa</a>
+                <a href="/Admin/DeleteReview/@r.MaDanhGia" class="btn btn-danger btn-sm">Xóa</a>
+            </td>
+        </tr>
+    }
+</table> 

@@ -31,6 +31,18 @@ using (var scope = app.Services.CreateScope())
     var passwordHasher = new PasswordHasher<NguoiDung>();
 
     // Seed admin account if not exists
+    if (!db.NguoiDungs.Any(u => u.TenDangNhap == "admin"))
+    {
+        var admin = new NguoiDung
+        {
+            TenDangNhap = "admin",
+            VaiTro = "Admin",
+            NgayTao = DateTime.Now
+        };
+        admin.MatKhau = passwordHasher.HashPassword(admin, "admin123456");
+        db.NguoiDungs.Add(admin);
+        db.SaveChanges();
+    }
 
     // Seed CSKH account if not exists
     if (!db.CsKhs.Any(u => u.Username == "cskh1"))

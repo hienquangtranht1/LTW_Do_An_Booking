@@ -1,0 +1,13 @@
+@model BookinhMVC.Models.Khoa
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Departments";
+    ViewBag.Title = "Xóa Khoa";
+}
+<h2>Xóa Khoa</h2>
+<p>Bạn có chắc chắn muốn xóa khoa <b>@Model.TenKhoa</b>?</p>
+<form asp-action="DeleteDepartment" method="post">
+    <input type="hidden" asp-for="MaKhoa" />
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a href="/Admin/Departments" class="btn btn-secondary">Hủy</a>
+</form> 

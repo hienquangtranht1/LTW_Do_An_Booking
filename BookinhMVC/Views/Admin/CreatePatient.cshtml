@@ -1,0 +1,27 @@
+@model BookinhMVC.Models.BenhNhan
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Patients";
+    ViewBag.Title = "Thêm Bệnh nhân";
+}
+<h2>Thêm Bệnh nhân</h2>
+<form asp-action="CreatePatient" method="post">
+    <div class="mb-2">
+        <label>Họ tên</label>
+        <input asp-for="HoTen" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Giới tính</label>
+        <input asp-for="GioiTinh" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Số điện thoại</label>
+        <input asp-for="SoDienThoai" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a href="/Admin/Patients" class="btn btn-secondary">Quay lại</a>
+</form> 

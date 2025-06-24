@@ -11,7 +11,6 @@
         var patient = _db.BenhNhans.FirstOrDefault(b => b.MaBenhNhan == userId);
         patientName = patient?.HoTen;
     }
-    // Xác định trạng thái đăng nhập của bất kỳ người dùng nào
     bool isLoggedIn = !string.IsNullOrEmpty(userRole);
 }
 <!DOCTYPE html>
@@ -20,155 +19,345 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Four Rock Hospital</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/BookinhMVC.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
     <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #6b7280;
+            --accent: #22c55e;
+            --background: #f9fafb;
+            --text: #111827;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary) !important;
+            transition: color 0.2s;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text) !important;
+            padding: 0.5rem 1rem;
+            transition: color 0.2s, background 0.2s;
+            border-radius: 6px;
+        }
+
+            .nav-link:hover, .nav-link.active {
+                color: var(--primary) !important;
+                background: rgba(30, 64, 175, 0.05);
+            }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            font-weight: 500;
+            padding: 0.5rem 1.5rem;
+            transition: background 0.2s, color 0.2s;
+        }
+
+            .dropdown-item:hover {
+                background: rgba(30, 64, 175, 0.05);
+                color: var(--primary);
+            }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+            border-radius: 6px;
+        }
+
+            .btn-primary:hover {
+                background: #1e3a8a;
+                transform: translateY(-1px);
+            }
+
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            transition: background 0.2s, color 0.2s;
+        }
+
+            .btn-outline-primary:hover {
+                background: var(--primary);
+                color: white;
+            }
+
+        .btn-success {
+            background: var(--accent);
+            border: none;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+            .btn-success:hover {
+                background: #16a34a;
+                transform: translateY(-1px);
+            }
+
+        .container {
+            padding-top: 5rem;
+            max-width: 1400px;
+        }
+
+        footer {
+            background: #1f2937;
+            color: #d1d5db;
+            padding: 3rem 0;
+            margin-top: 3rem;
+        }
+
+            footer h5 {
+                color: white;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+
+            footer a {
+                color: #d1d5db;
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+
+                footer a:hover {
+                    color: var(--primary);
+                }
+
+        .social-links a {
+            font-size: 1.5rem;
+            margin: 0 0.5rem;
+        }
+
+        .sub-footer {
+            background: #111827;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+            .sub-footer .btn {
+                margin: 0 0.5rem;
+            }
+
         #cskh-chat-icon, #chatbot-chat-icon {
             position: fixed;
-            right: 32px;
+            right: 2rem;
             z-index: 1050;
         }
 
         #cskh-chat-icon {
-            bottom: 110px;
+            bottom: 7.5rem;
         }
 
         #chatbot-chat-icon {
-            bottom: 40px;
+            bottom: 2.5rem;
         }
 
             #cskh-chat-icon .btn, #chatbot-chat-icon .btn {
-                width: 60px;
-                height: 60px;
-                font-size: 2rem;
+                width: 3.5rem;
+                height: 3.5rem;
+                font-size: 1.5rem;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                transition: transform 0.2s, box-shadow 0.2s;
+                border-radius: 50%;
             }
+
+                #cskh-chat-icon .btn:hover, #chatbot-chat-icon .btn:hover {
+                    transform: scale(1.1);
+                    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+                }
 
         .chatbox {
-            position: absolute;
-            right: 70px;
-            bottom: 0;
-            width: 320px;
-            background: #fff;
+            position: fixed;
+            right: 5rem;
+            bottom: 2.5rem;
+            width: 360px;
+            background: white;
             border-radius: 12px;
             overflow: hidden;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-            animation: fadeInUp .2s;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: fadeInUp 0.3s ease-out;
         }
 
-        @@keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
+        .chatbox-header {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbox-body {
+            height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f9fafb;
+        }
+
+        .chatbox-footer {
+            padding: 0.75rem;
+            background: white;
+            border-top: 1px solid var(--border);
+        }
+
+            .chatbox-footer input {
+                border-radius: 6px;
+                border: 1px solid var(--border);
+                padding: 0.5rem;
+                font-size: 0.9rem;
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .chatbox-footer button {
+                border-radius: 6px;
+                padding: 0.5rem 1rem;
             }
+
+        @@keyframes fadeInUp {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         }
 
         @@media (max-width: 576px) {
-            .chatbox {
-                right: 0;
-                left: 0;
-                width: 100vw;
-                min-width: 0;
-            }
+            .chatbox
+
+        {
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            border-radius: 0;
+        }
+
+        #cskh-chat-icon, #chatbot-chat-icon {
+            right: 1rem;
+        }
+
+        .sub-footer .btn {
+            margin: 0.5rem;
+        }
+
+        }
+
+        @@media (min-width: 768px) {
+            html
+
+        {
+            font-size: 16px;
+        }
+
+        }
+
+        .form-control:focus, .btn:focus {
+            box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
         }
     </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background: rgba(255,255,255,0.95);backdrop-filter: blur(10px);border-bottom: 1px solid #e0e0e0;transition: all 0.3s ease;padding: 1rem 0;">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index" style="font-weight:700;font-size:1.8rem;color:#2563eb;">
-                    <i class="fas fa-hospital-alt mr-2"></i>Four Rock Hospital
+        <nav class="navbar navbar-expand-lg fixed-top">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-hospital-alt me-2"></i>Four Rock Hospital
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center">
+                    <ul class="navbar-nav ms-auto align-items-center gap-2">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home mr-1"></i>Trang chủ
+                                <i class="fas fa-home me-1"></i>Trang chủ
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="HospitalBlog">
-                                <i class="fas fa-blog mr-1"></i>Blog
+                                <i class="fas fa-blog me-1"></i>Blog
                             </a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="serviceDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-stethoscope mr-1"></i>Dịch vụ
+                                <i class="fas fa-stethoscope me-1"></i>Dịch vụ
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="serviceDropdown">
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Home" asp-action="GeneralCheckup">
-                                        <i class="fas fa-user-md mr-2"></i>Khám tổng quát
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Home" asp-action="Cardiology">
-                                        <i class="fas fa-heartbeat mr-2"></i>Tim mạch
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Home" asp-action="Testing">
-                                        <i class="fas fa-vial mr-2"></i>Xét nghiệm
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" asp-controller="Home" asp-action="GeneralCheckup"><i class="fas fa-user-md me-2"></i>Khám tổng quát</a></li>
+                                <li><a class="dropdown-item" asp-controller="Home" asp-action="Cardiology"><i class="fas fa-heartbeat me-2"></i>Tim mạch</a></li>
+                                <li><a class="dropdown-item" asp-controller="Home" asp-action="Testing"><i class="fas fa-vial me-2"></i>Xét nghiệm</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-info-circle mr-1"></i>Giới thiệu
+                                <i class="fas fa-info-circle me-1"></i>Giới thiệu
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Home" asp-action="HospitalAbout">
-                                        <i class="fas fa-building mr-2"></i>Bệnh viện
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="@Url.Action("Doctors", "Home")">
-                                        <i class="fas fa-users"></i> Bác sĩ
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" asp-controller="Home" asp-action="HospitalAbout"><i class="fas fa-building me-2"></i>Bệnh viện</a></li>
+                                <li><a class="dropdown-item" asp-controller="Home" asp-action="Doctors"><i class="fas fa-users me-2"></i>Bác sĩ</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="QA">
-                                <i class="fas fa-question-circle mr-1"></i>Hỏi đáp
+                                <i class="fas fa-question-circle me-1"></i>Hỏi đáp
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Contact">
-                                <i class="fas fa-phone mr-1"></i>Liên hệ
+                                <i class="fas fa-phone me-1"></i>Liên hệ
                             </a>
                         </li>
                         @if (!string.IsNullOrEmpty(patientName) && userRole == "Bệnh nhân")
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-user mr-1"></i>@patientName
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user me-1"></i>@patientName
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" asp-controller="User" asp-action="ChangePassword">Đổi mật khẩu</a></li>
                                     <li><a class="dropdown-item" asp-controller="User" asp-action="UpdateProfile">Hồ sơ cá nhân</a></li>
+                                    <li><a class="dropdown-item" asp-controller="User" asp-action="Appointments">Lịch hẹn</a></li>
                                     <li><hr class="dropdown-divider" /></li>
                                     <li>
-                                        <form asp-controller="User" asp-action="Logout" method="post" class="dropdown-item p-0 m-0">
+                                        <form asp-controller="User" asp-action="Logout" method="post" class="dropdown-item p-0">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-link p-0 m-0" style="color:inherit;text-align:left;">Đăng xuất</button>
+                                            <button type="submit" class="btn btn-link p-0 w-100 text-start">Đăng xuất</button>
                                         </form>
                                     </li>
                                 </ul>
@@ -177,16 +366,16 @@
                         else if (!string.IsNullOrEmpty(cskhName) && userRole == "CSKH")
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="cskhDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-headset mr-1"></i>@cskhName
+                                <a class="nav-link dropdown-toggle" href="#" id="cskhDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-headset me-1"></i>@cskhName
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="cskhDropdown">
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" asp-controller="CSKH" asp-action="Dashboard">Dashboard CSKH</a></li>
                                     <li><hr class="dropdown-divider" /></li>
                                     <li>
-                                        <form asp-controller="CSKH" asp-action="Logout" method="post" class="dropdown-item p-0 m-0">
+                                        <form asp-controller="CSKH" asp-action="Logout" method="post" class="dropdown-item p-0">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-link p-0 m-0" style="color:inherit;text-align:left;">Đăng xuất</button>
+                                            <button type="submit" class="btn btn-link p-0 w-100 text-start">Đăng xuất</button>
                                         </form>
                                     </li>
                                 </ul>
@@ -195,25 +384,10 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="btn btn-primary mr-2" asp-controller="User" asp-action="Register">Đăng ký</a>
+                                <a class="btn btn-primary ms-2" asp-controller="User" asp-action="Register">Đăng ký</a>
                             </li>
                             <li class="nav-item">
-                                <a class="btn btn-outline-primary mr-2" asp-controller="User" asp-action="Login">Đăng nhập</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="btn btn-warning mr-2" asp-controller="CSKH" asp-action="Login">
-                                    <i class="fas fa-headset mr-1"></i>Đăng nhập CSKH
-                                </a>
-                            </li>
-                        }
-                        @* Ẩn hai nút này khi bất kỳ người dùng nào đã đăng nhập *@
-                        @if (!isLoggedIn)
-                        {
-                            <li class="nav-item">
-                                <a class="btn btn-info mr-2" asp-controller="Doctor" asp-action="Login">Bác sĩ</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="btn btn-dark" asp-controller="Admin" asp-action="Login">Admin</a>
+                                <a class="btn btn-outline-primary ms-2" asp-controller="User" asp-action="Login">Đăng nhập</a>
                             </li>
                         }
                     </ul>
@@ -221,142 +395,135 @@
             </div>
         </nav>
     </header>
-    <div class="container" style="padding-top:90px;">
-        <main role="main" class="pb-3">
+    <div class="container">
+        <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>
-    <footer class="bg-light text-center p-3 mt-5">
+    <footer>
         <div class="container">
-            <div class="row py-3">
-                <div class="col-md-4 mb-2">
-                    <h5><i class="fas fa-hospital-alt mr-2"></i>Four Rock Hospital</h5>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5><i class="fas fa-hospital-alt me-2"></i>Four Rock Hospital</h5>
                     <p>Chăm sóc sức khỏe hàng đầu với công nghệ hiện đại và đội ngũ y bác sĩ chuyên nghiệp.</p>
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-4 mb-4">
                     <h5>Liên kết nhanh</h5>
                     <ul class="list-unstyled">
-                        <li><a asp-controller="Home" asp-action="GeneralCheckup" class="text-dark">Khám tổng quát</a></li>
-                        <li><a asp-controller="Home" asp-action="Testing" class="text-dark">Xét nghiệm</a></li>
-                        <li><a asp-controller="Home" asp-action="Cardiology" class="text-dark">Tim mạch</a></li>
-                        <li><a asp-controller="Home" asp-action="HospitalAbout" class="text-dark">Giới thiệu</a></li>
-                        <li><a asp-controller="Home" asp-action="HospitalBlog" class="text-dark">Blog</a></li>
-                        <li><a asp-controller="Home" asp-action="Contact" class="text-dark">Liên hệ</a></li>
+                        <li><a asp-controller="Home" asp-action="GeneralCheckup">Khám tổng quát</a></li>
+                        <li><a asp-controller="Home" asp-action="Testing">Xét nghiệm</a></li>
+                        <li><a asp-controller="Home" asp-action="Cardiology">Tim mạch</a></li>
+                        <li><a asp-controller="Home" asp-action="HospitalAbout">Giới thiệu</a></li>
+                        <li><a asp-controller="Home" asp-action="HospitalBlog">Blog</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact">Liên hệ</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-4 mb-4">
                     <h5>Theo dõi chúng tôi</h5>
                     <div class="social-links">
-                        <a href="#" class="text-dark mr-3"><i class="fab fa-facebook fa-2x"></i></a>
-                        <a href="#" class="text-dark mr-3"><i class="fab fa-youtube fa-2x"></i></a>
-                        <a href="#" class="text-dark mr-3"><i class="fab fa-instagram fa-2x"></i></a>
-                        <a href="#" class="text-dark"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-youtube fa-lg"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#"><i class="fab fa-twitter fa-lg"></i></a>
                     </div>
                 </div>
             </div>
             <hr class="bg-secondary" />
-            <p class="mb-0">&copy; 2025 Four Rock Hospital. All Rights Reserved. | Thiết kế bởi Four Rock Team</p>
+            <p class="mb-0 text-center">© 2025 Four Rock Hospital. All Rights Reserved. | Thiết kế bởi Four Rock Team</p>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    @if (!isLoggedIn)
+    {
+        <div class="sub-footer">
+            <a class="btn btn-success" asp-controller="CSKH" asp-action="Login"><i class="fas fa-headset me-1"></i>CSKH</a>
+            <a class="btn btn-info" asp-controller="Doctor" asp-action="Login">Bác sĩ</a>
+            <a class="btn btn-dark" asp-controller="Admin" asp-action="Login">Admin</a>
+        </div>
+    }
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @if (!string.IsNullOrEmpty(patientName) && userRole == "Bệnh nhân")
     {
-        <!-- CSKH Chat Icon & Box -->
         <div id="cskh-chat-icon">
-            <button type="button"
-                    class="btn btn-primary rounded-circle shadow"
-                    title="Chat với CSKH"
-                    onclick="toggleCSKHChatBox(event)">
+            <button type="button" class="btn btn-primary" title="Chat với CSKH" onclick="toggleCSKHChatBox(event)">
                 <i class="fas fa-comments"></i>
             </button>
-            <div id="cskhChatBox" class="chatbox shadow" style="display:none;">
-                <div class="chatbox-header bg-primary text-white py-2 px-3 d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-headset"></i> CSKH Four Rock</span>
-                    <button type="button" class="btn-close btn-close-white btn-sm" onclick="closeCSKHChatBox()"></button>
+            <div id="cskhChatBox" class="chatbox" style="display:none;">
+                <div class="chatbox-header bg-primary text-white">
+                    <span><i class="fas fa-headset me-2"></i>CSKH Four Rock</span>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeCSKHChatBox()"></button>
                 </div>
-                <div class="chatbox-body p-2" style="height:260px;overflow-y:auto;" id="cskhChatMessages">
+                <div class="chatbox-body" id="cskhChatMessages">
                     <div class="text-center text-muted my-2" id="cskhChatLoading">Đang tải hội thoại...</div>
                 </div>
-                <div class="chatbox-footer p-2">
-                    <form id="cskhChatForm" class="w-100 d-flex gap-2" autocomplete="off" onsubmit="return sendCSKHMessage();">
-                        <input type="text" id="cskhChatInput" class="form-control" placeholder="Nhập tin nhắn..." maxlength="500" autocomplete="off" required />
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+                <div class="chatbox-footer">
+                    <form id="cskhChatForm" class="d-flex gap-2" autocomplete="off" onsubmit="return sendCSKHMessage();">
+                        <input type="text" id="cskhChatInput" class="form-control" placeholder="Nhập tin nhắn..." maxlength="500" required />
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
             </div>
         </div>
-        <!-- Chatbot Chat Icon & Box -->
         <div id="chatbot-chat-icon">
-            <button type="button"
-                    class="btn btn-success rounded-circle shadow"
-                    title="Chatbot hỗ trợ"
-                    onclick="toggleChatbotChatBox(event)">
+            <button type="button" class="btn btn-success" title="Chatbot hỗ trợ" onclick="toggleChatbotChatBox(event)">
                 <i class="fas fa-robot"></i>
             </button>
-            <div id="chatbotChatBox" class="chatbox shadow" style="display:none;">
-                <div class="chatbox-header bg-success text-white py-2 px-3 d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-robot"></i> Chatbot Four Rock</span>
-                    <button type="button" class="btn-close btn-close-white btn-sm" onclick="closeChatbotChatBox()"></button>
+            <div id="chatbotChatBox" class="chatbox" style="display:none;">
+                <div class="chatbox-header bg-success text-white">
+                    <span><i class="fas fa-robot me-2"></i>Chatbot Four Rock</span>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeChatbotChatBox()"></button>
                 </div>
-                <div class="chatbox-body p-2" style="height:260px;overflow-y:auto;" id="chatbotChatMessages">
+                <div class="chatbox-body" id="chatbotChatMessages">
                     <div class="text-center text-muted my-2" id="chatbotChatLoading">Đang tải hội thoại...</div>
                 </div>
-                <div class="chatbox-footer p-2">
-                    <form id="chatbotChatForm" class="w-100 d-flex gap-2" autocomplete="off" onsubmit="return sendChatbotMessage();">
-                        <input type="text" id="chatbotChatInput" class="form-control" placeholder="Nhập câu hỏi cho chatbot..." maxlength="500" autocomplete="off" required />
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+                <div class="chatbox-footer">
+                    <form id="chatbotChatForm" class="d-flex gap-2" autocomplete="off" onsubmit="return sendChatbotMessage();">
+                        <input type="text" id="chatbotChatInput" class="form-control" placeholder="Nhập câu hỏi cho chatbot..." maxlength="500" required />
+                        <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
             </div>
         </div>
         <script>
-            // Only one chatbox open at a time
             function toggleCSKHChatBox(e) {
                 e.stopPropagation();
                 closeChatbotChatBox();
                 let box = document.getElementById('cskhChatBox');
-                if (box.style.display === 'none' || box.style.display === '') {
-                    box.style.display = 'block';
+                box.style.display = box.style.display === 'none' || box.style.display === '' ? 'block' : 'none';
+                if (box.style.display === 'block') {
                     loadCSKHMessages();
                     setTimeout(() => document.getElementById('cskhChatInput').focus(), 200);
-                } else {
-                    box.style.display = 'none';
                 }
             }
+
             function closeCSKHChatBox() {
                 document.getElementById('cskhChatBox').style.display = 'none';
             }
+
             function toggleChatbotChatBox(e) {
                 e.stopPropagation();
                 closeCSKHChatBox();
                 let box = document.getElementById('chatbotChatBox');
-                if (box.style.display === 'none' || box.style.display === '') {
-                    box.style.display = 'block';
+                box.style.display = box.style.display === 'none' || box.style.display === '' ? 'block' : 'none';
+                if (box.style.display === 'block') {
                     loadChatbotMessages();
                     setTimeout(() => document.getElementById('chatbotChatInput').focus(), 200);
-                } else {
-                    box.style.display = 'none';
                 }
             }
+
             function closeChatbotChatBox() {
                 document.getElementById('chatbotChatBox').style.display = 'none';
             }
-            // CSKH Chat logic
+
             function loadCSKHMessages() {
                 $("#cskhChatLoading").show();
-                $("#cskhChatMessages").empty().append('<div class="text-center text-muted my-2" id="cskhChatLoading">Đang tải hội thoại...</div>');
+                $("#cskhChatMessages").empty().append('<div class="text-center text-muted my-2">Đang tải hội thoại...</div>');
                 $.post('/api/patient/getMessages', { user1: '@userId', user2: 1 }, function (res) {
                     $("#cskhChatMessages").empty();
                     if (res.success && res.messages.length > 0) {
                         res.messages.forEach(function (msg) {
                             var align = msg.senderId == @userId ? "text-end" : "text-start";
-                            var bg = msg.senderId == @userId ? "bg-primary text-white" : "bg-light";
+                            var bg = msg.senderId == @userId ? "bg-primary text-white" : "bg-white border";
                             $("#cskhChatMessages").append(
                                 `<div class="mb-2 ${align}">
                                     <span class="d-inline-block px-3 py-2 rounded ${bg}" style="max-width:80%;word-break:break-word;">${msg.message}</span>
@@ -369,6 +536,7 @@
                     $("#cskhChatMessages").scrollTop($("#cskhChatMessages")[0].scrollHeight);
                 });
             }
+
             function sendCSKHMessage() {
                 var msg = $("#cskhChatInput").val().trim();
                 if (!msg) return false;
@@ -388,30 +556,26 @@
                 });
                 return false;
             }
-            // Chatbot Chat logic
+
             function loadChatbotMessages() {
-                $("#chatbotChatLoading").show();
-                $("#chatbotChatMessages").empty().append('<div class="text-center text-muted my-2" id="chatbotChatLoading">Đang tải hội thoại...</div>');
-                // Lưu lịch sử hội thoại phía client nếu muốn, ở đây chỉ clear box
                 $("#chatbotChatMessages").empty();
             }
+
             function sendChatbotMessage() {
                 var msg = $("#chatbotChatInput").val().trim();
                 if (!msg) return false;
                 $("#chatbotChatInput").prop("disabled", true);
-                // Hiển thị tin nhắn người dùng
                 $("#chatbotChatMessages").append(
                     `<div class="mb-2 text-end">
-                        <span class="d-inline-block px-3 py-2 rounded bg-success text-white" style="max-width:80%;word-break:break-word;">${msg}</span>
+                        <span class="d-inline-block px-3 py-2 rounded bg-success text-white" style="max-width:80%;">${msg}</span>
                     </div>`
                 );
                 $("#chatbotChatInput").val('');
                 $("#chatbotChatMessages").scrollTop($("#chatbotChatMessages")[0].scrollHeight);
-                // Gửi tới API
                 $.post('/api/chatbot', { message: msg }, function (res) {
                     $("#chatbotChatMessages").append(
                         `<div class="mb-2 text-start">
-                            <span class="d-inline-block px-3 py-2 rounded bg-light" style="max-width:80%;word-break:break-word;">${res.reply}</span>
+                            <span class="d-inline-block px-3 py-2 rounded bg-white border" style="max-width:80%;">${res.reply}</span>
                         </div>`
                     );
                     $("#chatbotChatMessages").scrollTop($("#chatbotChatMessages")[0].scrollHeight);
@@ -420,8 +584,8 @@
                 });
                 return false;
             }
-            // Đóng chatbox khi click ra ngoài
-            document.addEventListener('click', function (e) {
+
+            document.addEventListener('click', function(e) {
                 if (!document.getElementById('cskh-chat-icon').contains(e.target)) closeCSKHChatBox();
                 if (!document.getElementById('chatbot-chat-icon').contains(e.target)) closeChatbotChatBox();
             });

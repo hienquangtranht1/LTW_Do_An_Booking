@@ -1,0 +1,28 @@
+@model BookinhMVC.Models.DanhGia
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Active = "Reviews";
+    ViewBag.Title = "Sửa Đánh giá";
+}
+<h2>Sửa Đánh giá</h2>
+<form asp-action="EditReview" method="post">
+    <input type="hidden" asp-for="MaDanhGia" />
+    <div class="mb-2">
+        <label>Mã bác sĩ</label>
+        <input asp-for="MaBacSi" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Mã bệnh nhân</label>
+        <input asp-for="MaBenhNhan" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Điểm đánh giá</label>
+        <input asp-for="DiemDanhGia" class="form-control" type="number" min="1" max="5" />
+    </div>
+    <div class="mb-2">
+        <label>Nhận xét</label>
+        <input asp-for="NhanXet" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a href="/Admin/Reviews" class="btn btn-secondary">Quay lại</a>
+</form> 

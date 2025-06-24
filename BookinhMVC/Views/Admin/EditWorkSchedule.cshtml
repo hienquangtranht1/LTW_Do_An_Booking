@@ -1,0 +1,40 @@
+@model BookinhMVC.Models.LichLamViec
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Sửa lịch làm việc";
+    var doctors = ViewBag.Doctors as List<BookinhMVC.Models.BacSi>;
+}
+<h2>Sửa lịch làm việc</h2>
+<form asp-action="EditWorkSchedule" method="post">
+    <input type="hidden" name="MaLich" value="@Model.MaLich" />
+    <div class="mb-3">
+        <label class="form-label">Bác sĩ</label>
+        <select name="MaBacSi" class="form-select" required>
+            @foreach (var bs in doctors)
+            {
+                <option value="@bs.MaBacSi" selected="@(Model.MaBacSi == bs.MaBacSi ? "selected" : null)">@bs.HoTen (@bs.Khoa?.TenKhoa)</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Ngày làm việc</label>
+        <input type="date" name="NgayLamViec" class="form-control" value="@Model.NgayLamViec.ToString("yyyy-MM-dd")" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Giờ bắt đầu</label>
+        <input type="time" name="GioBatDau" class="form-control" value="@Model.GioBatDau.ToString(@"hh\:mm")" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Giờ kết thúc</label>
+        <input type="time" name="GioKetThuc" class="form-control" value="@Model.GioKetThuc.ToString(@"hh\:mm")" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Trạng thái</label>
+        <select name="TrangThai" class="form-select">
+            <option value="Chưa xác nhận" selected="@(Model.TrangThai == "Chưa xác nhận" ? "selected" : null)">Chưa xác nhận</option>
+            <option value="Đã xác nhận" selected="@(Model.TrangThai == "Đã xác nhận" ? "selected" : null)">Đã xác nhận</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a href="@Url.Action("WorkSchedules")" class="btn btn-secondary">Quay lại</a>
+</form> 
