@@ -48,14 +48,11 @@
                 <div class="col-md-6">
                     <label class="form-label">Tuần:</label>
                     <div class="input-group">
-                        <button type="submit" name="weekStart" value="@weekStart.AddDays(-7).ToString("yyyy-MM-dd")" 
-                                class="btn btn-outline-primary">
+                        <button type="button" class="btn btn-outline-primary" onclick="changeWeek(-7)">
                             <i class="fas fa-chevron-left"></i> Tuần trước
                         </button>
-                        <input type="date" name="weekStart" value="@weekStart.ToString("yyyy-MM-dd")" 
-                               class="form-control text-center">
-                        <button type="submit" name="weekStart" value="@weekStart.AddDays(7).ToString("yyyy-MM-dd")" 
-                                class="btn btn-outline-primary">
+                        <input type="date" id="weekStartInput" name="weekStart" value="@weekStart.ToString("yyyy-MM-dd")" class="form-control text-center">
+                        <button type="button" class="btn btn-outline-primary" onclick="changeWeek(7)">
                             Tuần sau <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -238,3 +235,13 @@
     font-size: 0.7em;
 }
 </style>
+
+<script>
+function changeWeek(offset) {
+    var input = document.getElementById('weekStartInput');
+    var date = new Date(input.value);
+    date.setDate(date.getDate() + offset);
+    input.value = date.toISOString().slice(0,10);
+    input.form.submit();
+}
+</script>
