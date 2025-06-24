@@ -167,80 +167,39 @@
 
         #cskh-chat-icon, #chatbot-chat-icon {
             position: fixed;
-            right: 2rem;
+            right: 32px;
             z-index: 1050;
         }
 
         #cskh-chat-icon {
-            bottom: 7.5rem;
+            bottom: 110px;
         }
 
         #chatbot-chat-icon {
-            bottom: 2.5rem;
+            bottom: 40px;
         }
 
             #cskh-chat-icon .btn, #chatbot-chat-icon .btn {
-                width: 3.5rem;
-                height: 3.5rem;
-                font-size: 1.5rem;
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                transition: transform 0.2s, box-shadow 0.2s;
-                border-radius: 50%;
             }
-
-                #cskh-chat-icon .btn:hover, #chatbot-chat-icon .btn:hover {
-                    transform: scale(1.1);
-                    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-                }
 
         .chatbox {
-            position: fixed;
-            right: 5rem;
-            bottom: 2.5rem;
-            width: 360px;
-            background: white;
+            position: absolute;
+            right: 70px;
+            bottom: 0;
+            width: 320px;
+            background: #fff;
             border-radius: 12px;
             overflow: hidden;
-            border: 1px solid var(--border);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            animation: fadeInUp 0.3s ease-out;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+            animation: fadeInUp .2s;
         }
-
-        .chatbox-header {
-            padding: 0.75rem 1rem;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chatbox-body {
-            height: 300px;
-            overflow-y: auto;
-            padding: 1rem;
-            background: #f9fafb;
-        }
-
-        .chatbox-footer {
-            padding: 0.75rem;
-            background: white;
-            border-top: 1px solid var(--border);
-        }
-
-            .chatbox-footer input {
-                border-radius: 6px;
-                border: 1px solid var(--border);
-                padding: 0.5rem;
-                font-size: 0.9rem;
-            }
-
-            .chatbox-footer button {
-                border-radius: 6px;
-                padding: 0.5rem 1rem;
-            }
 
         @@keyframes fadeInUp {
             from
@@ -444,86 +403,100 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @if (!string.IsNullOrEmpty(patientName) && userRole == "Bệnh nhân")
     {
+        <!-- CSKH Chat Icon & Box -->
         <div id="cskh-chat-icon">
-            <button type="button" class="btn btn-primary" title="Chat với CSKH" onclick="toggleCSKHChatBox(event)">
+            <button type="button"
+                    class="btn btn-primary rounded-circle shadow"
+                    title="Chat với CSKH"
+                    onclick="toggleCSKHChatBox(event)">
                 <i class="fas fa-comments"></i>
             </button>
-            <div id="cskhChatBox" class="chatbox" style="display:none;">
-                <div class="chatbox-header bg-primary text-white">
-                    <span><i class="fas fa-headset me-2"></i>CSKH Four Rock</span>
-                    <button type="button" class="btn-close btn-close-white" onclick="closeCSKHChatBox()"></button>
+            <div id="cskhChatBox" class="chatbox shadow" style="display:none;">
+                <div class="chatbox-header bg-primary text-white py-2 px-3 d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-headset"></i> CSKH Four Rock</span>
+                    <button type="button" class="btn-close btn-close-white btn-sm" onclick="closeCSKHChatBox()"></button>
                 </div>
-                <div class="chatbox-body" id="cskhChatMessages">
+                <div class="chatbox-body p-2" style="height:260px;overflow-y:auto;" id="cskhChatMessages">
                     <div class="text-center text-muted my-2" id="cskhChatLoading">Đang tải hội thoại...</div>
                 </div>
-                <div class="chatbox-footer">
-                    <form id="cskhChatForm" class="d-flex gap-2" autocomplete="off" onsubmit="return sendCSKHMessage();">
-                        <input type="text" id="cskhChatInput" class="form-control" placeholder="Nhập tin nhắn..." maxlength="500" required />
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                <div class="chatbox-footer p-2">
+                    <form id="cskhChatForm" class="w-100 d-flex gap-2" autocomplete="off" onsubmit="return sendCSKHMessage();">
+                        <input type="text" id="cskhChatInput" class="form-control" placeholder="Nhập tin nhắn..." maxlength="500" autocomplete="off" required />
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
+        <!-- Chatbot Chat Icon & Box -->
         <div id="chatbot-chat-icon">
-            <button type="button" class="btn btn-success" title="Chatbot hỗ trợ" onclick="toggleChatbotChatBox(event)">
+            <button type="button"
+                    class="btn btn-success rounded-circle shadow"
+                    title="Chatbot hỗ trợ"
+                    onclick="toggleChatbotChatBox(event)">
                 <i class="fas fa-robot"></i>
             </button>
-            <div id="chatbotChatBox" class="chatbox" style="display:none;">
-                <div class="chatbox-header bg-success text-white">
-                    <span><i class="fas fa-robot me-2"></i>Chatbot Four Rock</span>
-                    <button type="button" class="btn-close btn-close-white" onclick="closeChatbotChatBox()"></button>
+            <div id="chatbotChatBox" class="chatbox shadow" style="display:none;">
+                <div class="chatbox-header bg-success text-white py-2 px-3 d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-robot"></i> Chatbot Four Rock</span>
+                    <button type="button" class="btn-close btn-close-white btn-sm" onclick="closeChatbotChatBox()"></button>
                 </div>
-                <div class="chatbox-body" id="chatbotChatMessages">
+                <div class="chatbox-body p-2" style="height:260px;overflow-y:auto;" id="chatbotChatMessages">
                     <div class="text-center text-muted my-2" id="chatbotChatLoading">Đang tải hội thoại...</div>
                 </div>
-                <div class="chatbox-footer">
-                    <form id="chatbotChatForm" class="d-flex gap-2" autocomplete="off" onsubmit="return sendChatbotMessage();">
-                        <input type="text" id="chatbotChatInput" class="form-control" placeholder="Nhập câu hỏi cho chatbot..." maxlength="500" required />
-                        <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane"></i></button>
+                <div class="chatbox-footer p-2">
+                    <form id="chatbotChatForm" class="w-100 d-flex gap-2" autocomplete="off" onsubmit="return sendChatbotMessage();">
+                        <input type="text" id="chatbotChatInput" class="form-control" placeholder="Nhập câu hỏi cho chatbot..." maxlength="500" autocomplete="off" required />
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
         <script>
+            // Only one chatbox open at a time
             function toggleCSKHChatBox(e) {
                 e.stopPropagation();
                 closeChatbotChatBox();
                 let box = document.getElementById('cskhChatBox');
-                box.style.display = box.style.display === 'none' || box.style.display === '' ? 'block' : 'none';
-                if (box.style.display === 'block') {
+                if (box.style.display === 'none' || box.style.display === '') {
+                    box.style.display = 'block';
                     loadCSKHMessages();
                     setTimeout(() => document.getElementById('cskhChatInput').focus(), 200);
+                } else {
+                    box.style.display = 'none';
                 }
             }
-
             function closeCSKHChatBox() {
                 document.getElementById('cskhChatBox').style.display = 'none';
             }
-
             function toggleChatbotChatBox(e) {
                 e.stopPropagation();
                 closeCSKHChatBox();
                 let box = document.getElementById('chatbotChatBox');
-                box.style.display = box.style.display === 'none' || box.style.display === '' ? 'block' : 'none';
-                if (box.style.display === 'block') {
+                if (box.style.display === 'none' || box.style.display === '') {
+                    box.style.display = 'block';
                     loadChatbotMessages();
                     setTimeout(() => document.getElementById('chatbotChatInput').focus(), 200);
+                } else {
+                    box.style.display = 'none';
                 }
             }
-
             function closeChatbotChatBox() {
                 document.getElementById('chatbotChatBox').style.display = 'none';
             }
-
+            // CSKH Chat logic
             function loadCSKHMessages() {
                 $("#cskhChatLoading").show();
-                $("#cskhChatMessages").empty().append('<div class="text-center text-muted my-2">Đang tải hội thoại...</div>');
+                $("#cskhChatMessages").empty().append('<div class="text-center text-muted my-2" id="cskhChatLoading">Đang tải hội thoại...</div>');
                 $.post('/api/patient/getMessages', { user1: '@userId', user2: 1 }, function (res) {
                     $("#cskhChatMessages").empty();
                     if (res.success && res.messages.length > 0) {
                         res.messages.forEach(function (msg) {
                             var align = msg.senderId == @userId ? "text-end" : "text-start";
-                            var bg = msg.senderId == @userId ? "bg-primary text-white" : "bg-white border";
+                            var bg = msg.senderId == @userId ? "bg-primary text-white" : "bg-light";
                             $("#cskhChatMessages").append(
                                 `<div class="mb-2 ${align}">
                                     <span class="d-inline-block px-3 py-2 rounded ${bg}" style="max-width:80%;word-break:break-word;">${msg.message}</span>
@@ -536,7 +509,6 @@
                     $("#cskhChatMessages").scrollTop($("#cskhChatMessages")[0].scrollHeight);
                 });
             }
-
             function sendCSKHMessage() {
                 var msg = $("#cskhChatInput").val().trim();
                 if (!msg) return false;
@@ -556,26 +528,30 @@
                 });
                 return false;
             }
-
+            // Chatbot Chat logic
             function loadChatbotMessages() {
+                $("#chatbotChatLoading").show();
+                $("#chatbotChatMessages").empty().append('<div class="text-center text-muted my-2" id="chatbotChatLoading">Đang tải hội thoại...</div>');
+                // Lưu lịch sử hội thoại phía client nếu muốn, ở đây chỉ clear box
                 $("#chatbotChatMessages").empty();
             }
-
             function sendChatbotMessage() {
                 var msg = $("#chatbotChatInput").val().trim();
                 if (!msg) return false;
                 $("#chatbotChatInput").prop("disabled", true);
+                // Hiển thị tin nhắn người dùng
                 $("#chatbotChatMessages").append(
                     `<div class="mb-2 text-end">
-                        <span class="d-inline-block px-3 py-2 rounded bg-success text-white" style="max-width:80%;">${msg}</span>
+                        <span class="d-inline-block px-3 py-2 rounded bg-success text-white" style="max-width:80%;word-break:break-word;">${msg}</span>
                     </div>`
                 );
                 $("#chatbotChatInput").val('');
                 $("#chatbotChatMessages").scrollTop($("#chatbotChatMessages")[0].scrollHeight);
+                // Gửi tới API
                 $.post('/api/chatbot', { message: msg }, function (res) {
                     $("#chatbotChatMessages").append(
                         `<div class="mb-2 text-start">
-                            <span class="d-inline-block px-3 py-2 rounded bg-white border" style="max-width:80%;">${res.reply}</span>
+                            <span class="d-inline-block px-3 py-2 rounded bg-light" style="max-width:80%;word-break:break-word;">${res.reply}</span>
                         </div>`
                     );
                     $("#chatbotChatMessages").scrollTop($("#chatbotChatMessages")[0].scrollHeight);
@@ -584,13 +560,14 @@
                 });
                 return false;
             }
-
-            document.addEventListener('click', function(e) {
+            // Đóng chatbox khi click ra ngoài
+            document.addEventListener('click', function (e) {
                 if (!document.getElementById('cskh-chat-icon').contains(e.target)) closeCSKHChatBox();
                 if (!document.getElementById('chatbot-chat-icon').contains(e.target)) closeChatbotChatBox();
             });
         </script>
     }
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

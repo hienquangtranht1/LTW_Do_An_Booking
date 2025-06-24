@@ -178,8 +178,8 @@
                         $('#selectedDate').empty().append('<option value="">Chọn ngày</option>');
                         if (data && data.length > 0) {
                             data.forEach(function (date) {
-                                var d = new Date(date);
-                                var val = d.toISOString().split('T')[0];
+                                // Lấy phần ngày trước ký tự T (nếu có), không dùng new Date để tránh lệch múi giờ
+                                var val = date.split('T')[0];
                                 $('#selectedDate').append(
                                     `<option value="${val}">${formatDate(date)}</option>`
                                 );
